@@ -1,0 +1,11 @@
+{
+  "source_url": "https://archive.ics.uci.edu/static/public/222/bank+marketing.zip",
+  "doi": "10.24432/C5K306",
+  "license": "CC BY 4.0",
+  "file": "bank-additional-full.csv",
+  "download_date": "2026-10-25",
+  "size_bytes": 5834924,
+  "rows": 41188,
+  "columns": 21,
+  "sha256": "74adfc578bf77a7ff4bb1ba4a9f8709d9e3c6907342959c2c8416847e0afb4d8"
+}

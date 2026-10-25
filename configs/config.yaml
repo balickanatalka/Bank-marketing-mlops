@@ -1,0 +1,17 @@
+seed: 42
+data:
+  raw: data/raw/bank-additional-full.csv
+  manifest: metadata/data_manifest.json
+  target: y
+  features: [age, job, marital, education, default, housing, loan, pdays, previous, poutcome]
+split:
+  train: 0.60
+  validation: 0.15
+  final_test: 0.10
+  replay: 0.15
+model:
+  max_iter: 1000
+paths:
+  prepared: data/processed
+  models: artifacts/models
+  reports: artifacts/reports

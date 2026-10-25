@@ -1,0 +1,80 @@
+{
+  "timestamp_utc": "2026-10-25T19:27:06.951414+00:00",
+  "checks": [
+    {
+      "command": [
+        "uv",
+        "run",
+        "--locked",
+        "ruff",
+        "check",
+        "src",
+        "tests",
+        "scripts",
+        "notebooks"
+      ],
+      "exit_code": 0,
+      "stdout": "All checks passed!\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "uv",
+        "run",
+        "--locked",
+        "ruff",
+        "format",
+        "--check",
+        "src",
+        "tests",
+        "scripts",
+        "notebooks"
+      ],
+      "exit_code": 0,
+      "stdout": "14 files already formatted\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "uv",
+        "run",
+        "--locked",
+        "pytest",
+        "-q",
+        "-p",
+        "no:cacheprovider",
+        "--basetemp=artifacts/checks-4b4eba2652a1433893407f413c4fd9a9"
+      ],
+      "exit_code": 0,
+      "stdout": ".....................                                                    [100%]\n21 passed in 1.92s\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "uv",
+        "run",
+        "--locked",
+        "pre-commit",
+        "run",
+        "--files",
+        "src\\cli.py",
+        "src\\config.py",
+        "src\\pipeline.py",
+        "src\\__init__.py",
+        "src\\data\\download.py",
+        "src\\data\\validation.py",
+        "src\\data\\__init__.py",
+        "tests\\test_config.py",
+        "tests\\test_data.py",
+        "tests\\test_pipeline.py",
+        "tests\\test_stages.py",
+        "scripts\\verify_checks.py",
+        "scripts\\verify_reproduction.py",
+        "notebooks\\01_bank_marketing_eda.ipynb"
+      ],
+      "exit_code": 0,
+      "stdout": "Ruff check (uv.lock).....................................................Passed\nRuff format (uv.lock)....................................................Passed\n",
+      "stderr": ""
+    }
+  ]
+}

@@ -1,0 +1,113 @@
+{
+  "timestamp_utc": "2026-10-25T18:04:55.133103+00:00",
+  "local_clone_with_uncommitted_source_overlay": true,
+  "remote_clone_verified": false,
+  "python_version": "3.12.10",
+  "pinned_python_version": "3.12.10",
+  "same_machine_only": true,
+  "independent_review": false,
+  "clean_copy_metrics_equal": true,
+  "repeat_metrics_equal": true,
+  "seed_123_metrics_equal": true,
+  "models": {
+    "dummy": {
+      "accuracy": 0.871479443185497,
+      "macro_f1": 0.4656633800380557,
+      "average_precision": 0.12852055681450308,
+      "precision_yes": 0.0,
+      "recall_yes": 0.0,
+      "roc_auc": 0.5,
+      "brier_score": 0.12852055681450308,
+      "lift_at_10_percent": null
+    },
+    "model": {
+      "accuracy": 0.8706701197798641,
+      "macro_f1": 0.47400036592413053,
+      "average_precision": 0.18504639379371762,
+      "precision_yes": 0.3684210526315789,
+      "recall_yes": 0.008816120906801008,
+      "roc_auc": 0.5721377783225603,
+      "brier_score": 0.11827509073529083,
+      "lift_at_10_percent": 1.8411751017558755
+    }
+  },
+  "steps": [
+    {
+      "command": [
+        "uv",
+        "sync",
+        "--locked"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "Using CPython 3.12.10 interpreter at: <USER_HOME>\\AppData\\Local\\Programs\\Python\\Python312\\python.exe\nCreating virtual environment at: .venv\nResolved 72 packages in 0.53ms\nwarning: Failed to hardlink files; falling back to full copy. This may lead to degraded performance.\n         If the cache and target directories are on different filesystems, hardlinking may not be supported.\n         If this is intentional, set `export UV_LINK_MODE=copy` or use `--link-mode=copy` to suppress this warning.\nInstalled 66 packages in 5.13s\n + asttokens==3.0.2\n + attrs==26.1.0\n + cfgv==3.5.0\n + cloudpickle==3.1.2\n + colorama==0.4.6\n + comm==0.2.3\n + contourpy==1.4.0\n + cycler==0.12.1\n + debugpy==1.8.22\n + distlib==0.4.4\n + executing==2.3.0\n + fastjsonschema==2.22.2\n + filelock==4.2.4\n + fonttools==4.67.0\n + identify==2.6.20\n + iniconfig==2.3.1\n + ipykernel==7.4.0\n + ipython==9.17.1\n + ipython-pygments-lexers==1.1.1\n + jedi==0.20.1\n + joblib==1.6.0\n + jsonschema==4.26.0\n + jsonschema-specifications==2025.9.1\n + jupyter-client==8.10.0\n + jupyter-core==5.9.1\n + kiwisolver==1.5.1\n + matplotlib==3.11.2\n + matplotlib-inline==0.2.2\n + narwhals==2.27.1\n + nbclient==0.11.0\n + nbformat==5.11.1\n + nest-asyncio2==1.7.4\n + nodeenv==1.11.0\n + numpy==2.5.4\n + packaging==26.3\n + pandas==2.3.3\n + parso==0.8.7\n + pillow==13.0.0\n + platformdirs==4.13.5\n + pluggy==1.7.0\n + pre-commit==4.7.0\n + prompt-toolkit==3.0.53\n + psutil==7.2.2\n + pure-eval==0.2.4\n + pygments==2.21.0\n + pyparsing==3.3.3\n + pytest==9.1.1\n + python-dateutil==3.0.0\n + python-discovery==1.6.4\n + pytz==2026.5\n + pyyaml==6.0.3\n + pyzmq==27.2.0\n + referencing==0.37.0\n + rpds-py==2026.9.1\n + ruff==0.17.2\n + scikit-learn==1.9.1\n + scipy==1.18.1\n + six==1.17.0\n + stack-data==0.6.3\n + threadpoolctl==3.7.0\n + tornado==6.6\n + traitlets==5.16.1\n + typing-extensions==4.16.0\n + tzdata==2026.5\n + virtualenv==21.14.13\n + wcwidth==0.9.4\n"
+    },
+    {
+      "command": [
+        "uv",
+        "run",
+        "--locked",
+        "python",
+        "--version"
+      ],
+      "exit_code": 0,
+      "stdout": "Python 3.12.10\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "uv",
+        "run",
+        "--locked",
+        "python",
+        "-m",
+        "src.cli",
+        "all"
+      ],
+      "exit_code": 0,
+      "stdout": "{\"stage\": \"prepare\", \"status\": \"OK\", \"summary\": {\"train\": {\"rows\": 24712, \"start_inclusive\": 0, \"end_exclusive\": 24712, \"sha256\": \"1455552f4116fbf8077dd65963423a3c35269ca4429b2b634758210ae878256b\"}, \"validation\": {\"rows\": 6178, \"start_inclusive\": 24712, \"end_exclusive\": 30890, \"sha256\": \"cf033d45d63d1e8453cbb3e9258efbde7f338f9a4eca822f7c3d5bacaa5eacc6\"}, \"final_test\": {\"rows\": 4118, \"start_inclusive\": 30890, \"end_exclusive\": 35008, \"sha256\": \"e6d185f43e8396a00df131392e3bff8b92de01a7e301dc75bb0d4a6777d1815a\"}, \"replay\": {\"rows\": 6180, \"start_inclusive\": 35008, \"end_exclusive\": 41188, \"sha256\": \"62beef9384e58b0745f3221c467897d7cff4e7970175ba34ad9904f860732f23\"}}}\n{\"stage\": \"train\", \"status\": \"OK\", \"summary\": {}}\n{\"stage\": \"evaluate\", \"status\": \"OK\", \"summary\": {\"dummy\": {\"accuracy\": 0.871479443185497, \"macro_f1\": 0.4656633800380557, \"average_precision\": 0.12852055681450308, \"precision_yes\": 0.0, \"recall_yes\": 0.0, \"roc_auc\": 0.5, \"brier_score\": 0.12852055681450308, \"lift_at_10_percent\": null}, \"model\": {\"accuracy\": 0.8706701197798641, \"macro_f1\": 0.47400036592413053, \"average_precision\": 0.18504639379371762, \"precision_yes\": 0.3684210526315789, \"recall_yes\": 0.008816120906801008, \"roc_auc\": 0.5721377783225603, \"brier_score\": 0.11827509073529083, \"lift_at_10_percent\": 1.8411751017558755}}}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "uv",
+        "run",
+        "--locked",
+        "pytest",
+        "-q",
+        "--basetemp=artifacts/pytest-fresh-copy"
+      ],
+      "exit_code": 0,
+      "stdout": "....................                                                     [100%]\n20 passed in 1.92s\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "uv",
+        "run",
+        "--locked",
+        "python",
+        "-m",
+        "src.cli",
+        "all"
+      ],
+      "exit_code": 0,
+      "stdout": "{\"stage\": \"prepare\", \"status\": \"OK\", \"summary\": {\"train\": {\"rows\": 24712, \"start_inclusive\": 0, \"end_exclusive\": 24712, \"sha256\": \"1455552f4116fbf8077dd65963423a3c35269ca4429b2b634758210ae878256b\"}, \"validation\": {\"rows\": 6178, \"start_inclusive\": 24712, \"end_exclusive\": 30890, \"sha256\": \"cf033d45d63d1e8453cbb3e9258efbde7f338f9a4eca822f7c3d5bacaa5eacc6\"}, \"final_test\": {\"rows\": 4118, \"start_inclusive\": 30890, \"end_exclusive\": 35008, \"sha256\": \"e6d185f43e8396a00df131392e3bff8b92de01a7e301dc75bb0d4a6777d1815a\"}, \"replay\": {\"rows\": 6180, \"start_inclusive\": 35008, \"end_exclusive\": 41188, \"sha256\": \"62beef9384e58b0745f3221c467897d7cff4e7970175ba34ad9904f860732f23\"}}}\n{\"stage\": \"train\", \"status\": \"OK\", \"summary\": {}}\n{\"stage\": \"evaluate\", \"status\": \"OK\", \"summary\": {\"dummy\": {\"accuracy\": 0.871479443185497, \"macro_f1\": 0.4656633800380557, \"average_precision\": 0.12852055681450308, \"precision_yes\": 0.0, \"recall_yes\": 0.0, \"roc_auc\": 0.5, \"brier_score\": 0.12852055681450308, \"lift_at_10_percent\": null}, \"model\": {\"accuracy\": 0.8706701197798641, \"macro_f1\": 0.47400036592413053, \"average_precision\": 0.18504639379371762, \"precision_yes\": 0.3684210526315789, \"recall_yes\": 0.008816120906801008, \"roc_auc\": 0.5721377783225603, \"brier_score\": 0.11827509073529083, \"lift_at_10_percent\": 1.8411751017558755}}}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "uv",
+        "run",
+        "--locked",
+        "python",
+        "-m",
+        "src.cli",
+        "all"
+      ],
+      "exit_code": 0,
+      "stdout": "{\"stage\": \"prepare\", \"status\": \"OK\", \"summary\": {\"train\": {\"rows\": 24712, \"start_inclusive\": 0, \"end_exclusive\": 24712, \"sha256\": \"1455552f4116fbf8077dd65963423a3c35269ca4429b2b634758210ae878256b\"}, \"validation\": {\"rows\": 6178, \"start_inclusive\": 24712, \"end_exclusive\": 30890, \"sha256\": \"cf033d45d63d1e8453cbb3e9258efbde7f338f9a4eca822f7c3d5bacaa5eacc6\"}, \"final_test\": {\"rows\": 4118, \"start_inclusive\": 30890, \"end_exclusive\": 35008, \"sha256\": \"e6d185f43e8396a00df131392e3bff8b92de01a7e301dc75bb0d4a6777d1815a\"}, \"replay\": {\"rows\": 6180, \"start_inclusive\": 35008, \"end_exclusive\": 41188, \"sha256\": \"62beef9384e58b0745f3221c467897d7cff4e7970175ba34ad9904f860732f23\"}}}\n{\"stage\": \"train\", \"status\": \"OK\", \"summary\": {}}\n{\"stage\": \"evaluate\", \"status\": \"OK\", \"summary\": {\"dummy\": {\"accuracy\": 0.871479443185497, \"macro_f1\": 0.4656633800380557, \"average_precision\": 0.12852055681450308, \"precision_yes\": 0.0, \"recall_yes\": 0.0, \"roc_auc\": 0.5, \"brier_score\": 0.12852055681450308, \"lift_at_10_percent\": null}, \"model\": {\"accuracy\": 0.8706701197798641, \"macro_f1\": 0.47400036592413053, \"average_precision\": 0.18504639379371762, \"precision_yes\": 0.3684210526315789, \"recall_yes\": 0.008816120906801008, \"roc_auc\": 0.5721377783225603, \"brier_score\": 0.11827509073529083, \"lift_at_10_percent\": 1.8411751017558755}}}\n",
+      "stderr": ""
+    }
+  ]
+}
