@@ -1,0 +1,65 @@
+# =====================================
+# Python - środowisko i cache
+# =====================================
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.ipynb_checkpoints/
+
+# =====================================
+# Sekrety i konfiguracja prywatna
+# =====================================
+.env
+.env.*
+!.env.example
+secrets/
+*.pem
+*.key
+*.p12
+*.pfx
+
+# =====================================
+# Dane i modele ML
+# =====================================
+data/
+artifacts/
+*.joblib
+*.pkl
+
+# =====================================
+# MLflow - eksperymenty
+# =====================================
+mlruns/
+mlartifacts/
+
+# =====================================
+# Raporty testów i logi
+# =====================================
+.coverage
+htmlcov/
+*.log
+logs/
+
+# =====================================
+# Lokalne bazy danych
+# =====================================
+*.sqlite
+*.sqlite3
+*.db
+
+# =====================================
+# Konfiguracja lokalna VS Code
+# =====================================
+.vscode/
+
+# =====================================
+# Pliki systemowe
+# =====================================
+.DS_Store
+Thumbs.db
+
+# Prywatny plan projektu dla Codexa
+docs/PROJECT_PLAN.md
