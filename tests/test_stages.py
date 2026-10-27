@@ -5,6 +5,7 @@ import pandas as pd
 import pytest
 
 from src.config import load_config
+from src.data.schema import CATEGORIES
 from src.data.validation import CATEGORICAL, NUMERIC, validate_dataframe
 from src.pipeline import evaluate, prepare, train
 
@@ -30,7 +31,7 @@ def prepared(tmp_path, monkeypatch):
     raw.parent.mkdir(parents=True)
     df = pd.DataFrame({c: [1, 2] * 100 for c in NUMERIC})
     for column in CATEGORICAL:
-        df[column] = ["a", "b"] * 100
+        df[column] = sorted(CATEGORIES[column])[:2] * 100
     df["y"] = ["no", "yes"] * 100
     df.to_csv(raw, index=False, sep=";")
     manifest = tmp_path / config["data"]["manifest"]
@@ -62,6 +63,20 @@ def test_stages_do_not_consume_holdout(prepared):
     assert result["evaluation_split"] == "validation"
     assert not result["final_test_evaluated"]
     assert result["models"]["model"]["average_precision"] > 0.9
+
+
+def test_prepare_rejects_corruption_before_parsing(prepared, monkeypatch):
+    config, root = prepared
+    raw = root / config["data"]["raw"]
+    with raw.open("r+b") as stream:
+        stream.write(b"!")
+
+    def forbidden_read(*args, **kwargs):
+        pytest.fail("CSV parsing must not precede manifest verification")
+
+    monkeypatch.setattr("src.pipeline.pd.read_csv", forbidden_read)
+    with pytest.raises(ValueError, match="SHA-256"):
+        prepare(config)
 
 
 @pytest.mark.parametrize("fault", ["config", "partition", "model"])

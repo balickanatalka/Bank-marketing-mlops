@@ -13,8 +13,8 @@ Nie jest przeznaczony do podejmowania rzeczywistych decyzji finansowych.
 
 | Zaimplementowane | Planowane w kolejnych etapach |
 |---|---|
-| Python, uv, plik blokady zależności i konfiguracja YAML | DVC: wersjonowanie danych, potok i cache |
-| Automatyczne pobieranie UCI i kontrola SHA-256 | MLflow: eksperymenty, rejestr i pochodzenie modeli |
+| Python, uv, plik blokady zależności i konfiguracja YAML | Pipeline DVC: etapy, zależności i `dvc repro` (zajęcia 4) |
+| Automatyczne pobieranie UCI, manifest i pełny kontrakt danych | MLflow: eksperymenty, rejestr i pochodzenie modeli |
 | Walidacja danych i podział chronologiczny | API, Docker oraz CI/CD z kontrolami jakości i bezpieczeństwa |
 | Notebook EDA, DummyClassifier i LogisticRegression | Staging, shadow deployment i rollback |
 | Wspólny preprocessing, trening i ewaluacja przez CLI | Monitoring, dryf, SLI/SLO i kontrolowany retraining |
@@ -22,6 +22,14 @@ Nie jest przeznaczony do podejmowania rzeczywistych decyzji finansowych.
 
 Microsoft RAG będzie rozszerzeniem korzystającym z dokumentacji i raportów MLOps.
 Nie zastępuje klasycznego modelu ani wymagań związanych z jego cyklem życia.
+
+Zajęcia 3: przygotowano metadane DVC i lokalny cache surowego CSV.
+DagsHub i zdalny magazyn DVC nie są wymagane. Odtworzenie zapewnia oficjalne UCI
+z weryfikacją SHA-256. Lokalne DVC sprawdzamy osobno; pipeline DVC jest etapem
+kolejnych zajęć. Procedura lokalnej weryfikacji i odtworzenia z UCI:
+[odtwarzalność](docs/REPRODUCIBILITY.md#zajęcia-3-integralność-i-lokalne-dvc).
+Lokalne wersjonowanie danych przez metadane DVC, cache i `dvc checkout` już działa.
+Nie zaimplementowano jeszcze `dvc.yaml`, `dvc.lock` ani pipeline'u `dvc repro`.
 
 ## Problem biznesowy i dane
 
@@ -229,7 +237,8 @@ zmianę względem metadanych, lecz nie zastępuje uwierzytelnienia źródła art
 
 Notebook korzysta z tych samych funkcji co CLI. W VS Code należy wybrać interpreter
 `.venv/Scripts/python.exe` oraz kernel tego środowiska; obsługa notebooków wymaga
-rozszerzenia Jupyter. Źródłowy notebook nie zawiera zapisanych wyników wykonania.
+rozszerzenia Jupyter. Przed publikacją notebooka należy osobno sprawdzić zapisane
+wyniki wykonania, osadzone podglądy danych i metadane środowiska.
 
 ## Testy i jakość kodu
 
@@ -283,5 +292,4 @@ wersji ani przeglądu przez drugą osobę. Aktualne dowody i pozostałe braki:
 
 Licencja zbioru danych jest opisana w [DATA_LICENSE.md](DATA_LICENSE.md).
 Informacje o zależnościach znajdują się w [THIRD_PARTY_NOTICES.md](docs/THIRD_PARTY_NOTICES.md).
-Repozytorium nie zawiera jeszcze deklaracji licencji własnego kodu; licencja danych
-nie nadaje automatycznie praw do kodu projektu.
+Własny kod projektu nie jest udostępniony na licencji open source. Dane UCI i komponenty zewnętrzne podlegają odrębnym licencjom opisanym w dokumentacji.

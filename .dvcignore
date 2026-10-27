@@ -1,0 +1,9 @@
+# Local environment, private material and outputs are not DVC inputs.
+.venv/
+.git/
+.pytest_cache/
+.ruff_cache/
+__pycache__/
+private_notes/
+artifacts/
+notebooks/.ipynb_checkpoints/

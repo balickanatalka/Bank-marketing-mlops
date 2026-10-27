@@ -1,6 +1,6 @@
 # Moment predykcji i dostępność cech
 
-Aktualizacja: 2026-10-25.
+Aktualizacja: 2026-10-27.
 
 Predykcja dotyczy momentu przed rozmową. Konserwatywna lista dopuszcza informacje o kliencie
 i zakończonych poprzednich kampaniach, zakładając ich obecność w systemie przed
@@ -23,3 +23,14 @@ Replay jest osobnym materiałem do przyszłej symulacji utrzymania.
 Zmiana seed nie tasuje danych. Duplikaty nie są usuwane na podstawie wyników modeli.
 Brak identyfikatora klienta pozostaje ograniczeniem; obecne zabezpieczenia
 nie gwarantują niezależności wszystkich osób między oknami.
+
+Kontrakt danych sprawdza oryginalny wariant 21 kolumn, więc dopuszcza `duration`
+w surowym CSV. Osobna lista `SAFE_FEATURES` blokuje tę kolumnę na wejściu modelu.
+Słowniki kategorii i ograniczenia dziedzinowe są zapisane jawnie; nie są uczone
+na pełnym CSV. `unknown` i `nonexistent` pozostają kategoriami, a `pdays=999`
+oznacza brak poprzedniego kontaktu. Dotychczasowy preprocessing tworzy osobny
+wskaźnik tej sytuacji i zastępuje 999 przez 0.
+
+Testy uszkodzeń i odtwarzania zajęć 3 pracują na izolowanych kopiach. Odczyt
+pełnego surowego CSV do kontroli kontraktu oraz fingerprinty plików służą
+integralności danych; nie stanowią ewaluacji modeli na final test ani replay.

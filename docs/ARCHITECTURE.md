@@ -20,6 +20,11 @@ niezgodność wejść; hash modelu jest sprawdzany przed deserializacją. Mechan
 nie zastępuje uwierzytelnienia artefaktów i wymaga zaufanego lokalnego treningu.
 Final test i replay są rozdzielone od części używanych do treningu i walidacji.
 
-Kierunki rozwoju obejmują DVC, MLflow, API, kontenery, CI/CD, monitoring i retraining.
+Kierunki rozwoju obejmują pipeline DVC, MLflow, API, kontenery, CI/CD, monitoring i retraining.
 Microsoft RAG ma korzystać z dokumentacji i raportów, nie obliczać predykcji ani
-samodzielnie promować modeli. Te funkcje nie są obecnie zaimplementowane.
+samodzielnie promować modeli. Wymienione przyszłe usługi i pipeline DVC nie są
+obecnie zaimplementowane; lokalne DVC działa w zakresie opisanym poniżej.
+
+DVC działa lokalnie dla surowego CSV; odtworzenie bez cache zapewnia oficjalne UCI
+i manifest SHA-256. DagsHub i zdalny magazyn DVC nie są wymagane.
+Lineage pozostaje wymaganiem. Pipeline DVC należy do zajęć 4.

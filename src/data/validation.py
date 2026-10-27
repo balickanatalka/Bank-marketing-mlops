@@ -3,6 +3,8 @@
 import numpy as np
 import pandas as pd
 
+from src.data.schema import CATEGORIES, INTEGER_BOUNDS, POSITIVE_COLUMNS
+
 NUMERIC = [
     "age",
     "duration",
@@ -46,6 +48,17 @@ def validate_dataframe(df: pd.DataFrame, expected_rows: int | None = 41188) -> d
     for column in CATEGORICAL:
         if not df[column].map(lambda value: isinstance(value, str)).all():
             raise ValueError(f"Oczekiwano kategorii tekstowej: {column}.")
+        if not df[column].isin(CATEGORIES[column]).all():
+            raise ValueError(f"Niedozwolona kategoria: {column}.")
+    for column, (lower, upper) in INTEGER_BOUNDS.items():
+        values = df[column]
+        if pd.api.types.is_bool_dtype(values) or (values % 1 != 0).any():
+            raise ValueError(f"Oczekiwano liczby całkowitej: {column}.")
+        if (values < lower).any() or (upper is not None and (values > upper).any()):
+            raise ValueError(f"Niepoprawny zakres: {column}.")
+    for column in POSITIVE_COLUMNS:
+        if (df[column] <= 0).any():
+            raise ValueError(f"Oczekiwano dodatniej wartości: {column}.")
     if (df.age <= 0).any() or (df[["duration", "pdays", "previous"]] < 0).any().any():
         raise ValueError("Niepoprawny zakres wieku lub liczników.")
     if (df.campaign < 1).any():

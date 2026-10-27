@@ -1,5 +1,6 @@
 """Download only the pinned CSV, never extract arbitrary archive paths."""
 
+import csv
 import hashlib
 import io
 import json
@@ -20,6 +21,16 @@ def verify_manifest(path: Path, manifest: dict) -> None:
         raise ValueError("SHA-256 CSV nie zgadza się z przypiętym manifestem.")
     if len(content) != manifest["size_bytes"]:
         raise ValueError("Rozmiar CSV nie zgadza się z manifestem.")
+    if "rows" in manifest and "columns" in manifest:
+        records = csv.reader(io.StringIO(content.decode("utf-8")), delimiter=";")
+        header = next(records)
+        rows = 0
+        for record in records:
+            if len(record) != manifest["columns"]:
+                raise ValueError("Liczba kolumn CSV nie zgadza się z manifestem.")
+            rows += 1
+        if len(header) != manifest["columns"] or rows != manifest["rows"]:
+            raise ValueError("Wymiary CSV nie zgadzają się z manifestem.")
 
 
 def extract_csv(content: bytes) -> bytes:
@@ -57,6 +68,7 @@ def ensure_data(path: Path, manifest_path: Path) -> dict:
                 raise ValueError("Niepoprawny rozmiar pobranego CSV.")
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_bytes(csv)
+            verify_manifest(path, manifest)
             return manifest
         except (URLError, TimeoutError):
             if attempt == 2:

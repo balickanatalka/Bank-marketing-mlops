@@ -1,0 +1,111 @@
+{
+  "timestamp_utc": "2026-10-27T22:34:33.468698+00:00",
+  "python": "3.12.10",
+  "remote_required": false,
+  "holdouts_used_for_model_selection": false,
+  "training_executed": false,
+  "steps": [
+    {
+      "command": [
+        "python",
+        "-m",
+        "dvc",
+        "checkout",
+        "metadata/bank-additional-full.csv.dvc"
+      ],
+      "exit_code": 0,
+      "stdout": "A       data\\raw\\bank-additional-full.csv\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python",
+        "-m",
+        "dvc",
+        "status"
+      ],
+      "exit_code": 0,
+      "stdout": "Data and pipelines are up to date.\n",
+      "stderr": ""
+    }
+  ],
+  "uci_contract": {
+    "rows": 41188,
+    "columns": 21,
+    "class_counts": {
+      "no": 36548,
+      "yes": 4640
+    },
+    "duplicates": 12,
+    "unknown_counts": {
+      "job": 330,
+      "marital": 80,
+      "education": 1731,
+      "default": 8597,
+      "housing": 990,
+      "loan": 990,
+      "contact": 0,
+      "month": 0,
+      "day_of_week": 0,
+      "poutcome": 0,
+      "y": 0
+    },
+    "pdays_999": 39673
+  },
+  "uci_download_without_local_csv_or_cache_verified": true,
+  "original_data_and_cache_access_blocked": true,
+  "manifest_verified": true,
+  "sha256": "74adfc578bf77a7ff4bb1ba4a9f8709d9e3c6907342959c2c8416847e0afb4d8",
+  "size_bytes": 5834924,
+  "contract": {
+    "rows": 41188,
+    "columns": 21,
+    "class_counts": {
+      "no": 36548,
+      "yes": 4640
+    },
+    "duplicates": 12,
+    "unknown_counts": {
+      "job": 330,
+      "marital": 80,
+      "education": 1731,
+      "default": 8597,
+      "housing": 990,
+      "loan": 990,
+      "contact": 0,
+      "month": 0,
+      "day_of_week": 0,
+      "poutcome": 0,
+      "y": 0
+    },
+    "pdays_999": 39673
+  },
+  "corrupted_copy_rejected": true,
+  "invalid_category_rejected": true,
+  "local_cache_checkout_verified": true,
+  "local_dvc_contract": {
+    "rows": 41188,
+    "columns": 21,
+    "class_counts": {
+      "no": 36548,
+      "yes": 4640
+    },
+    "duplicates": 12,
+    "unknown_counts": {
+      "job": 330,
+      "marital": 80,
+      "education": 1731,
+      "default": 8597,
+      "housing": 990,
+      "loan": 990,
+      "contact": 0,
+      "month": 0,
+      "day_of_week": 0,
+      "poutcome": 0,
+      "y": 0
+    },
+    "pdays_999": 39673
+  },
+  "existing_files_unchanged": true,
+  "status": "PASS"
+}
