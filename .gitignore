@@ -64,3 +64,10 @@ Thumbs.db
 # Prywatna dokumentacja lokalna
 private_notes/
 docs/PROJECT_PLAN.md
+
+# Local MLflow metadata and SQLite sidecars
+.mlflow/
+*.db-wal
+*.db-shm
+*.sqlite-wal
+*.sqlite-shm

@@ -1,0 +1,266 @@
+{
+  "status": "PASS",
+  "commands": [
+    {
+      "command": "python -m src.experiments",
+      "exit_code": 0,
+      "stdout": "{\"batch_id\": \"20261102T151844551437Z-c472392b\", \"output\": \"artifacts/lesson5/20261102T151844551437Z-c472392b\", \"winner\": \"logistic\", \"runs\": 6}\n",
+      "stderr": "2026/11/02 16:18:40 INFO mlflow.agent.hint: Load the `instrumenting-with-mlflow-tracing` skill at PROJECT_ROOT\\.venv\\Lib\\site-packages\\mlflow\\assistant\\skills\\instrumenting-with-mlflow-tracing\\SKILL.md before writing any tracing code; it ships with this MLflow install. Set MLFLOW_DISABLE_AGENT_HINT=1 to silence this.\n2026/11/02 16:18:47 INFO mlflow.store.db.utils: Creating initial MLflow database tables...\n2026/11/02 16:18:47 INFO mlflow.store.db.utils: Updating database tables\n"
+    },
+    {
+      "command": "python -m src.experiments",
+      "exit_code": 0,
+      "stdout": "{\"batch_id\": \"20261102T151910933024Z-55528901\", \"output\": \"artifacts/lesson5/20261102T151910933024Z-55528901\", \"winner\": \"logistic\", \"runs\": 6}\n",
+      "stderr": "2026/11/02 16:19:07 INFO mlflow.agent.hint: Load the `instrumenting-with-mlflow-tracing` skill at PROJECT_ROOT\\.venv\\Lib\\site-packages\\mlflow\\assistant\\skills\\instrumenting-with-mlflow-tracing\\SKILL.md before writing any tracing code; it ships with this MLflow install. Set MLFLOW_DISABLE_AGENT_HINT=1 to silence this.\n2026/11/02 16:19:13 INFO mlflow.store.db.utils: Creating initial MLflow database tables...\n2026/11/02 16:19:13 INFO mlflow.store.db.utils: Updating database tables\n"
+    }
+  ],
+  "batches": [
+    {
+      "batch_id": "20261102T151844551437Z-c472392b",
+      "output": "artifacts/lesson5/20261102T151844551437Z-c472392b",
+      "winner": "logistic",
+      "runs": 6
+    },
+    {
+      "batch_id": "20261102T151910933024Z-55528901",
+      "output": "artifacts/lesson5/20261102T151910933024Z-55528901",
+      "winner": "logistic",
+      "runs": 6
+    }
+  ],
+  "checks": {
+    "two_independent_batches": true,
+    "six_models_each": true,
+    "all_validation_metrics_equal": true,
+    "same_selection_and_split": true,
+    "validation_only": true,
+    "MLflow_readback_and_serialization": true
+  },
+  "results": {
+    "dummy": {
+      "run_id": "a3069e9a1683421ba21de7ca8ed4d799",
+      "parameters": {
+        "strategy": "most_frequent",
+        "seed": 42,
+        "decision_threshold": 0.5,
+        "algorithm": "dummy",
+        "protocol_sha256": "1ed6bf5f95f158b5ac63c10d9a4342d89831fab23bafe6e1d8c0bf297d34dfa6"
+      },
+      "metrics": {
+        "accuracy": 0.871479443185497,
+        "macro_f1": 0.4656633800380557,
+        "average_precision": 0.12852055681450308,
+        "precision_yes": 0.0,
+        "recall_yes": 0.0,
+        "roc_auc": 0.5,
+        "brier_score": 0.12852055681450308,
+        "lift_at_10_percent": null,
+        "f1_yes": 0.0
+      },
+      "model_sha256": "610e6fa4b053f9f0f2189911d66cc4476ec68d3af59b9fb7c18fc3f6060597f1",
+      "serialization_predictions_equal": true
+    },
+    "logistic": {
+      "run_id": "1727e138843c4ec8aacc5990124148c6",
+      "parameters": {
+        "C": 1.0,
+        "dual": false,
+        "fit_intercept": true,
+        "intercept_scaling": 1,
+        "l1_ratio": 0.0,
+        "max_iter": 1000,
+        "penalty": "deprecated",
+        "random_state": 42,
+        "solver": "lbfgs",
+        "tol": 0.0001,
+        "verbose": 0,
+        "warm_start": false,
+        "seed": 42,
+        "decision_threshold": 0.5,
+        "algorithm": "logistic",
+        "protocol_sha256": "1ed6bf5f95f158b5ac63c10d9a4342d89831fab23bafe6e1d8c0bf297d34dfa6"
+      },
+      "metrics": {
+        "accuracy": 0.8706701197798641,
+        "macro_f1": 0.47400036592413053,
+        "average_precision": 0.18504639379371762,
+        "precision_yes": 0.3684210526315789,
+        "recall_yes": 0.008816120906801008,
+        "roc_auc": 0.5721377783225603,
+        "brier_score": 0.11827509073534306,
+        "lift_at_10_percent": 1.8411751017558755,
+        "f1_yes": 0.017220172201722016
+      },
+      "model_sha256": "22ff5f780cb40e4a3bdc9f65331fe18a030fb7f7e472c37841ddd77e29a7c073",
+      "serialization_predictions_equal": true
+    },
+    "logistic_balanced": {
+      "run_id": "57d8a3db613a448fb6727344f52142c6",
+      "parameters": {
+        "C": 1.0,
+        "class_weight": "balanced",
+        "dual": false,
+        "fit_intercept": true,
+        "intercept_scaling": 1,
+        "l1_ratio": 0.0,
+        "max_iter": 1000,
+        "penalty": "deprecated",
+        "random_state": 42,
+        "solver": "lbfgs",
+        "tol": 0.0001,
+        "verbose": 0,
+        "warm_start": false,
+        "seed": 42,
+        "decision_threshold": 0.5,
+        "algorithm": "logistic_balanced",
+        "protocol_sha256": "1ed6bf5f95f158b5ac63c10d9a4342d89831fab23bafe6e1d8c0bf297d34dfa6"
+      },
+      "metrics": {
+        "accuracy": 0.5132729038523794,
+        "macro_f1": 0.44103102879107925,
+        "average_precision": 0.18270748760861213,
+        "precision_yes": 0.15017388555169142,
+        "recall_yes": 0.5982367758186398,
+        "roc_auc": 0.5675070223930594,
+        "brier_score": 0.25275857020220727,
+        "lift_at_10_percent": 1.778121159914921,
+        "f1_yes": 0.24008086934546374
+      },
+      "model_sha256": "777994af973e66a70331cca210ef8e9dbe0bd4bba66201c60f5e59081106d1b5",
+      "serialization_predictions_equal": true
+    },
+    "random_forest": {
+      "run_id": "1d92a1c6cd21401f9b69c7a91ae5d12c",
+      "parameters": {
+        "bootstrap": true,
+        "ccp_alpha": 0.0,
+        "class_weight": "balanced",
+        "criterion": "gini",
+        "max_depth": 6,
+        "max_features": "sqrt",
+        "min_impurity_decrease": 0.0,
+        "min_samples_leaf": 20,
+        "min_samples_split": 2,
+        "min_weight_fraction_leaf": 0.0,
+        "n_estimators": 100,
+        "n_jobs": 1,
+        "oob_score": false,
+        "random_state": 42,
+        "verbose": 0,
+        "warm_start": false,
+        "seed": 42,
+        "decision_threshold": 0.5,
+        "algorithm": "random_forest",
+        "protocol_sha256": "1ed6bf5f95f158b5ac63c10d9a4342d89831fab23bafe6e1d8c0bf297d34dfa6"
+      },
+      "metrics": {
+        "accuracy": 0.42602784072515376,
+        "macro_f1": 0.3892518163378574,
+        "average_precision": 0.1822011475421346,
+        "precision_yes": 0.14426059979317477,
+        "recall_yes": 0.7027707808564232,
+        "roc_auc": 0.5914463182262212,
+        "brier_score": 0.2499886163536106,
+        "lift_at_10_percent": 1.7907319482831119,
+        "f1_yes": 0.23938223938223938
+      },
+      "model_sha256": "8945266dab9570ff0b6dd2136c505cbc3430bca9cb877d4598832224607a8cd6",
+      "serialization_predictions_equal": true
+    },
+    "hist_gradient_boosting": {
+      "run_id": "7d1516bb6b9941199f35c9112bc83320",
+      "parameters": {
+        "categorical_features": "from_dtype",
+        "class_weight": "balanced",
+        "early_stopping": false,
+        "l2_regularization": 1.0,
+        "learning_rate": 0.08,
+        "loss": "log_loss",
+        "max_bins": 255,
+        "max_features": 1.0,
+        "max_iter": 100,
+        "max_leaf_nodes": 15,
+        "min_samples_leaf": 20,
+        "n_iter_no_change": 10,
+        "random_state": 42,
+        "scoring": "loss",
+        "tol": 1e-07,
+        "validation_fraction": 0.1,
+        "verbose": 0,
+        "warm_start": false,
+        "seed": 42,
+        "decision_threshold": 0.5,
+        "algorithm": "hist_gradient_boosting",
+        "protocol_sha256": "1ed6bf5f95f158b5ac63c10d9a4342d89831fab23bafe6e1d8c0bf297d34dfa6"
+      },
+      "metrics": {
+        "accuracy": 0.4800906442214309,
+        "macro_f1": 0.4171626900208842,
+        "average_precision": 0.16538308152768277,
+        "precision_yes": 0.13953488372093023,
+        "recall_yes": 0.5894206549118388,
+        "roc_auc": 0.5472707406215263,
+        "brier_score": 0.2394025348686753,
+        "lift_at_10_percent": 1.4880730274465297,
+        "f1_yes": 0.2256509161041466
+      },
+      "model_sha256": "619f30d8a2d20115190e5b13d9a5eb21ee2dfe91afb6677ea6aa438251a0e61e",
+      "serialization_predictions_equal": true
+    },
+    "xgboost": {
+      "run_id": "02b90a35d34d4751ba4e6a88b5634526",
+      "parameters": {
+        "objective": "binary:logistic",
+        "colsample_bytree": 1.0,
+        "device": "cpu",
+        "enable_categorical": true,
+        "eval_metric": "logloss",
+        "learning_rate": 0.05,
+        "max_depth": 3,
+        "min_child_weight": 10,
+        "missing": "nan",
+        "n_estimators": 150,
+        "n_jobs": 1,
+        "random_state": 42,
+        "scale_pos_weight": 19.801346801346803,
+        "subsample": 1.0,
+        "tree_method": "hist",
+        "seed": 42,
+        "decision_threshold": 0.5,
+        "algorithm": "xgboost",
+        "protocol_sha256": "1ed6bf5f95f158b5ac63c10d9a4342d89831fab23bafe6e1d8c0bf297d34dfa6"
+      },
+      "metrics": {
+        "accuracy": 0.4702168986727096,
+        "macro_f1": 0.41285637765153105,
+        "average_precision": 0.17221799405750512,
+        "precision_yes": 0.14103677961193165,
+        "recall_yes": 0.6133501259445844,
+        "roc_auc": 0.5597371257686736,
+        "brier_score": 0.24713967986891616,
+        "lift_at_10_percent": 1.6898456413375844,
+        "f1_yes": 0.22933835648693196
+      },
+      "model_sha256": "3fa1c6c942761ea67c80b25b72fabd668b038447106e219d6e93e547a8555242",
+      "serialization_predictions_equal": true
+    }
+  },
+  "selection": {
+    "winner": "logistic",
+    "eligible": [
+      "logistic",
+      "logistic_balanced",
+      "random_forest",
+      "hist_gradient_boosting",
+      "xgboost"
+    ],
+    "recall_floor": 0.008816120906801008,
+    "dummy_average_precision": 0.12852055681450308,
+    "threshold": 0.5,
+    "primary_metric": "average_precision",
+    "evaluation_split": "validation",
+    "production_promoted": false
+  },
+  "protected_files_unchanged": true,
+  "protected_file_count": 184
+}

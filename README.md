@@ -14,12 +14,13 @@ Nie jest przeznaczony do podejmowania rzeczywistych decyzji finansowych.
 | Zaimplementowane | Planowane w kolejnych etapach |
 |---|---|
 | Python, uv, plik blokady zależności i konfiguracja YAML | Dalsza automatyzacja jakości i utrzymania |
-| Automatyczne pobieranie UCI, manifest i pełny kontrakt danych | MLflow: eksperymenty, rejestr i pochodzenie modeli |
+| Automatyczne pobieranie UCI, manifest i pełny kontrakt danych | Rejestr modeli i kontrolowana promocja |
 | Walidacja danych i podział chronologiczny | API, Docker oraz CI/CD z kontrolami jakości i bezpieczeństwa |
 | Notebook EDA, DummyClassifier i LogisticRegression | Staging, shadow deployment i rollback |
 | Wspólny preprocessing, trening i ewaluacja przez CLI | Monitoring, dryf, SLI/SLO i kontrolowany retraining |
 | Testy pytest, Ruff i lokalne hooki pre-commit | Microsoft RAG z ewaluacją, cytowaniami i tracingiem |
 | Pipeline DVC: download, validate, prepare, train, evaluate; cache i parametry | Feature store tylko przy uzasadnionej potrzebie |
+| MLflow lokalnie: SQLite, 6 eksperymentów, parametry, metryki i artefakty | Dalsza integracja z rejestrem modeli |
 
 Microsoft RAG będzie rozszerzeniem korzystającym z dokumentacji i raportów MLOps.
 Nie zastępuje klasycznego modelu ani wymagań związanych z jego cyklem życia.
@@ -129,6 +130,25 @@ Weryfikator pracuje w nowym katalogu tymczasowym, pobiera CSV z UCI bez kopiowan
 oryginalnych danych/cache i zapisuje unikalny raport `reports/evidence/lesson4-dvc-*.json`.
 Nie uruchamia treningu w głównym workspace. Szczegóły i ograniczenia:
 [odtwarzalność](docs/REPRODUCIBILITY.md).
+
+## Local MLflow experiments
+
+Six controlled candidates now use the shared preprocessing: Dummy, Logistic Regression,
+balanced Logistic Regression, balanced Random Forest, balanced HistGradientBoosting and
+CPU XGBoost. The predefined validation AP/recall rule selects ordinary Logistic Regression.
+Its low recall at threshold 0.5 remains a material limitation; this is not a production model.
+
+```powershell
+uv run --locked python -m scripts.verify_lesson5
+```
+
+This creates two fresh local batches and checks reproducibility. SQLite, fitted models
+and full plots remain ignored under `artifacts/lesson5/`. There is no remote tracking
+or model promotion. The aggregate [comparison](reports/experiment_comparison.md),
+[protocol](docs/EXPERIMENT_PROTOCOL.md), [model card](docs/MODEL_CARD.md) and executed
+`notebooks/02_model_experiments.ipynb` describe actual validation results.
+See [reproduction instructions](docs/REPRODUCIBILITY.md) for export and local MLflow UI.
+Final test and replay remain reserved. MLflow Registry, API and Microsoft RAG are future work.
 
 ## Modele i rzeczywiste wyniki
 

@@ -1,0 +1,222 @@
+{
+  "status": "PASS",
+  "checks": [
+    {
+      "command": [
+        "USER_HOME\\AppData\\Local\\Programs\\Python\\Python312\\Scripts\\uv.EXE",
+        "run",
+        "--locked",
+        "ruff",
+        "check",
+        "src",
+        "tests",
+        "scripts",
+        "notebooks"
+      ],
+      "exit_code": 0,
+      "stdout": "All checks passed!\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "USER_HOME\\AppData\\Local\\Programs\\Python\\Python312\\Scripts\\uv.EXE",
+        "run",
+        "--locked",
+        "ruff",
+        "format",
+        "--check",
+        "src",
+        "tests",
+        "scripts",
+        "notebooks"
+      ],
+      "exit_code": 0,
+      "stdout": "29 files already formatted\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "USER_HOME\\AppData\\Local\\Programs\\Python\\Python312\\Scripts\\uv.EXE",
+        "run",
+        "--locked",
+        "pytest",
+        "-q",
+        "-p",
+        "no:cacheprovider",
+        "--basetemp",
+        "artifacts/lesson5-checks/20261102T154655424744Z-9a6c95d2"
+      ],
+      "exit_code": 0,
+      "stdout": "...................................................................      [100%]\n============================== warnings summary ===============================\ntests/test_experiments.py::test_local_tracking_six_runs_roundtrip_and_exclusive_reports\n  PROJECT_ROOT\\.venv\\Lib\\site-packages\\mlflow\\store\\tracking\\sqlalchemy_store.py:327: SADeprecationWarning: The ``noload`` loader strategy is deprecated and will be removed in a future release.  This option produces incorrect results by returning ``None`` for related items. (deprecated since: 2.1)\n    sqlalchemy.orm.configure_mappers()\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n67 passed, 1 warning in 22.76s\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "USER_HOME\\AppData\\Local\\Programs\\Python\\Python312\\Scripts\\uv.EXE",
+        "run",
+        "--locked",
+        "pre-commit",
+        "run",
+        "--files",
+        "src/__init__.py",
+        "src/cli.py",
+        "src/config.py",
+        "src/data/__init__.py",
+        "src/data/download.py",
+        "src/data/schema.py",
+        "src/data/validation.py",
+        "src/dvc_cli.py",
+        "src/experiment_report.py",
+        "src/experiments.py",
+        "src/features/__init__.py",
+        "src/features/build.py",
+        "src/pipeline.py",
+        "tests/test_config.py",
+        "tests/test_data.py",
+        "tests/test_dvc_cli.py",
+        "tests/test_experiments.py",
+        "tests/test_features.py",
+        "tests/test_lesson3_verifier.py",
+        "tests/test_pipeline.py",
+        "tests/test_stages.py",
+        "scripts/check_lesson5.py",
+        "scripts/verify_checks.py",
+        "scripts/verify_lesson3.py",
+        "scripts/verify_lesson4.py",
+        "scripts/verify_lesson5.py",
+        "scripts/verify_reproduction.py",
+        "notebooks/02_model_experiments.ipynb"
+      ],
+      "exit_code": 0,
+      "stdout": "Ruff check (uv.lock).....................................................Passed\nRuff format (uv.lock)....................................................Passed\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "USER_HOME\\AppData\\Local\\Programs\\Python\\Python312\\Scripts\\uv.EXE",
+        "lock",
+        "--check"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "Resolved 197 packages in 2ms\n"
+    },
+    {
+      "command": [
+        "USER_HOME\\AppData\\Local\\Programs\\Python\\Python312\\Scripts\\uv.EXE",
+        "pip",
+        "check"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "Checked 193 packages in 11ms\nAll installed packages are compatible\n"
+    },
+    {
+      "command": [
+        "USER_HOME\\AppData\\Local\\Programs\\Python\\Python312\\Scripts\\uv.EXE",
+        "run",
+        "--locked",
+        "dvc",
+        "dag",
+        "--dot"
+      ],
+      "exit_code": 0,
+      "stdout": "strict digraph {\n\"download\";\n\"validate\";\n\"prepare\";\n\"train\";\n\"evaluate\";\n\"download\" -> \"validate\";\n\"download\" -> \"prepare\";\n\"download\" -> \"train\";\n\"download\" -> \"evaluate\";\n\"validate\" -> \"prepare\";\n\"prepare\" -> \"train\";\n\"prepare\" -> \"evaluate\";\n\"train\" -> \"evaluate\";\n}\n\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "USER_HOME\\AppData\\Local\\Programs\\Python\\Python312\\Scripts\\uv.EXE",
+        "run",
+        "--locked",
+        "dvc",
+        "status",
+        "--json"
+      ],
+      "exit_code": 0,
+      "stdout": "{\"validate\": [{\"changed outs\": {\"artifactsLOCAL_PATH\": \"not in cache\"}}], \"prepare\": [{\"changed deps\": {\"src\\\\pipeline.py\": \"modified\", \"artifactsLOCAL_PATH\": \"deleted\"}}, {\"changed outs\": {\"dataLOCAL_PATH\": \"not in cache\", \"artifactsLOCAL_PATH\": \"not in cache\", \"artifactsLOCAL_PATH\": \"not in cache\"}}], \"train\": [{\"changed deps\": {\"src\\\\pipeline.py\": \"modified\", \"pyproject.toml\": \"modified\", \"uv.lock\": \"modified\", \"dataLOCAL_PATH\": \"deleted\", \"dataLOCAL_PATH\": \"deleted\"}}, {\"changed outs\": {\"artifactsLOCAL_PATH\": \"not in cache\"}}], \"evaluate\": [{\"changed deps\": {\"src\\\\pipeline.py\": \"modified\", \"pyproject.toml\": \"modified\", \"uv.lock\": \"modified\", \"dataLOCAL_PATH\": \"deleted\", \"dataLOCAL_PATH\": \"deleted\", \"artifactsLOCAL_PATH\": \"deleted\"}}, {\"changed outs\": {\"artifactsLOCAL_PATH\": \"not in cache\", \"artifactsLOCAL_PATH\": \"not in cache\", \"artifactsLOCAL_PATH\": \"not in cache\"}}]}\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0,
+      "stdout": "",
+      "stderr": "warning: in the working copy of 'notebooks/01_bank_marketing_eda.ipynb', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'pyproject.toml', LF will be replaced by CRLF the next time Git touches it\nwarning: in the working copy of 'uv.lock', LF will be replaced by CRLF the next time Git touches it\n"
+    }
+  ],
+  "root_dvc_note": "Baseline outputs/cache absent; source/dependency changes require repro. No root repro or historical lock update performed.",
+  "root_dvc_status": {
+    "validate": [
+      {
+        "changed outs": {
+          "artifacts\\lesson4\\validated.json": "not in cache"
+        }
+      }
+    ],
+    "prepare": [
+      {
+        "changed deps": {
+          "src\\pipeline.py": "modified",
+          "artifacts\\lesson4\\validated.json": "deleted"
+        }
+      },
+      {
+        "changed outs": {
+          "data\\lesson4\\processed": "not in cache",
+          "artifacts\\lesson4\\reports\\data_validation.json": "not in cache",
+          "artifacts\\lesson4\\reports\\class_distribution.png": "not in cache"
+        }
+      }
+    ],
+    "train": [
+      {
+        "changed deps": {
+          "src\\pipeline.py": "modified",
+          "pyproject.toml": "modified",
+          "uv.lock": "modified",
+          "data\\lesson4\\processed\\train.csv": "deleted",
+          "data\\lesson4\\processed\\metadata.json": "deleted"
+        }
+      },
+      {
+        "changed outs": {
+          "artifacts\\lesson4\\models": "not in cache"
+        }
+      }
+    ],
+    "evaluate": [
+      {
+        "changed deps": {
+          "src\\pipeline.py": "modified",
+          "pyproject.toml": "modified",
+          "uv.lock": "modified",
+          "data\\lesson4\\processed\\validation.csv": "deleted",
+          "data\\lesson4\\processed\\metadata.json": "deleted",
+          "artifacts\\lesson4\\models": "deleted"
+        }
+      },
+      {
+        "changed outs": {
+          "artifacts\\lesson4\\reports\\confusion_matrix_dummy.png": "not in cache",
+          "artifacts\\lesson4\\reports\\confusion_matrix_model.png": "not in cache",
+          "artifacts\\lesson4\\reports\\metrics.json": "not in cache"
+        }
+      }
+    ]
+  },
+  "notebook": {
+    "executed_code_cells": 7,
+    "errors": 0
+  },
+  "local_MLflow_UI": {
+    "url": "http://127.0.0.1:5005",
+    "health": 200,
+    "root": 200
+  },
+  "protected_files_unchanged": true,
+  "protected_file_count": 186
+}

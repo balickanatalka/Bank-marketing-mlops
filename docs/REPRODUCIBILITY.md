@@ -1,5 +1,50 @@
 # Odtwarzalność
 
+## Lokalne eksperymenty MLflow
+
+```powershell
+uv sync --locked
+uv run --locked python -m scripts.verify_lesson5
+```
+
+Weryfikator uruchamia dwie nowe, niezależne serie po sześć modeli, na tej samej
+walidacji i konfiguracji. Sprawdza zgodność wszystkich metryk z tolerancją 1e-12,
+wyboru modelu, protokołu, hashy splitów, odczytu MLflow i predykcji po serializacji.
+Każda seria ma osobny SQLite i katalog artefaktów pod `artifacts/lesson5/`.
+Nie nadpisuje wcześniejszych modeli i danych. Nowy raport ma unikalną nazwę
+`reports/evidence/lesson5-reproduction-<timestamp>-<id>.json`.
+
+Pojedyncza seria: `uv run --locked python -m src.experiments`.
+Eksport wybranej serii: `uv run --locked python -m src.experiment_report artifacts/lesson5/<batch>`.
+Eksporter odmawia nadpisania istniejących raportów; dla kolejnej serii użyj
+`--reports artifacts/lesson5/<batch>/export`. Notebook odczytuje zapisany publiczny
+snapshot, bez uczenia i bez dostępu do final test/replay.
+
+Interfejs MLflow dla konkretnej serii, z katalogu głównego repozytorium:
+
+```powershell
+uv run --locked mlflow server --backend-store-uri sqlite:///artifacts/lesson5/<batch>/tracking/mlflow.db --host 127.0.0.1 --port 5005 --workers 1 --no-serve-artifacts
+```
+
+Zastąp `<batch>` identyfikatorem istniejącej serii. Magazyn artefaktów jest zapisany
+w metadanych eksperymentu i pozostaje lokalny. SQLite, sidecary, modele oraz cache
+są ignorowane przez Git. Nie uruchamiaj serwera na 0.0.0.0 ani nie dodawaj lokalnej bazy do Git.
+MLflow na Windows nie zapewnia backendu wykonywania zadań; trening wykonuje CLI,
+a serwer służy do przeglądania eksperymentów. Nie korzystamy z tego backendu zadań.
+
+Odtworzenie potwierdzono w tym samym środowisku Python 3.12 i uv.lock, nie na drugim
+komputerze. Run ID, czas, lokalny URI oraz metadane Git mogą się różnić, choć metryki
+są zgodne. Kod niezacommitowany jest oznaczony jako dirty i identyfikowany hashami.
+
+Dotychczasowy dvc.yaml nadal odtwarza baseline zajęć 4. Eksperymenty MLflow mają
+osobny CLI i zapisują hash dvc.lock oraz przypięty SHA-256 tych samych danych.
+Zmiany src/pipeline.py, pyproject.toml i uv.lock powodują prawidłową nieaktualność
+odpowiednich zależności baseline w DVC. Nie nadpisano historycznego dvc.lock
+ani nie uruchomiono repro w głównym workspace. Kolejność i semantyka etapów są zachowane.
+
+MLflow/SQLAlchemy emitują ostrzeżenie deprecacyjne loadera `noload`; zapis i odczyt
+wszystkich parametrów/metryk są osobno sprawdzane. Nie ukrywa się ostrzeżenia w testach.
+
 Aktualizacja zajęć 4: 2026-11-02.
 
 ## Zajęcia 4: aktualny pipeline

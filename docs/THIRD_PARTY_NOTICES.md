@@ -237,3 +237,67 @@ Linki prowadzą do stron konkretnych wydań, nie są treścią licencji.
 | wcwidth | 0.9.4 | MIT License | [PyPI](https://pypi.org/project/wcwidth/0.9.4/) |
 | yarl | 1.25.1 | Apache-2.0 | [PyPI](https://pypi.org/project/yarl/1.25.1/) |
 | zc-lockfile | 4.0 | ZPL-2.1 | [PyPI](https://pypi.org/project/zc-lockfile/4.0/) |
+
+## Zajecia 5: local MLflow and CPU XGBoost
+
+Updated: 2026-11-02. The earlier table documents lesson 3; its entries remain unchanged.
+The current lock has 196 external distributions: 43 additions and no updates to earlier versions.
+42 added distributions are installed on Windows; Gunicorn is platform-conditional.
+
+MLflow, mlflow-skinny, mlflow-tracing and xgboost-cpu use Apache-2.0.
+Confirmed the installed direct license texts, SQLAlchemy MIT, Huey MIT and skops MIT,
+and inspected Arrow LICENSE/NOTICE. Arrow and MLflow bundles carry additional notices;
+a metadata label is not a complete license inventory of bundled frontend/native code.
+Dependencies are referenced and installed, not vendored into this repository.
+
+The official CPU-only XGBoost package avoids the unused NVIDIA NCCL dependency:
+[XGBoost installation](https://xgboost.readthedocs.io/en/stable/install.html).
+Gunicorn license metadata: [PyPI 26.2.0](https://pypi.org/project/gunicorn/26.2.0/).
+Other entries below use local installed distribution metadata and bundled license files.
+No custom open source license is added to project code; UCI attribution is unchanged.
+
+| Added distribution | Version | License declaration |
+|---|---|---|
+| alembic | 1.20.1 | MIT |
+| annotated-doc | 0.0.5 | MIT |
+| anyio | 4.16.0 | MIT |
+| blinker | 1.9.0 | MIT |
+| cachetools | 7.2.8 | MIT |
+| databricks-sdk | 0.159.0 | Apache-2.0 |
+| docker | 7.2.0 | Apache-2.0 |
+| fastapi | 0.162.0 | MIT |
+| flask | 3.1.3 | BSD-3-Clause |
+| flask-cors | 6.0.5 | MIT |
+| google-auth | 2.62.0 | Apache-2.0 |
+| graphene | 3.4 | MIT |
+| graphql-core | 3.2.13 | MIT license |
+| graphql-relay | 3.2.0 | MIT |
+| gunicorn | 26.2.0 | MIT (PyPI release metadata; not installed on Windows) |
+| h11 | 0.16.0 | MIT |
+| huey | 3.5.4 | MIT |
+| importlib-metadata | 9.1.0 | Apache-2.0 |
+| itsdangerous | 2.2.0 | BSD-3-Clause |
+| jinja2 | 3.1.6 | BSD-3-Clause |
+| mako | 1.4.3 | MIT |
+| markupsafe | 3.0.4 | BSD-3-Clause |
+| mlflow | 3.17.2 | Apache-2.0 |
+| mlflow-skinny | 3.17.2 | Apache-2.0 |
+| mlflow-tracing | 3.17.2 | Apache-2.0 |
+| opentelemetry-api | 1.45.2 | Apache-2.0 |
+| opentelemetry-proto | 1.45.2 | Apache-2.0 |
+| opentelemetry-sdk | 1.45.2 | Apache-2.0 |
+| opentelemetry-semantic-conventions | 0.66b2 | Apache-2.0 |
+| prettytable | 3.18.0 | BSD-3-Clause |
+| protobuf | 7.36.2 | BSD-3-Clause |
+| pyarrow | 25.0.1 | Apache-2.0 |
+| pyasn1 | 0.6.5 | BSD-2-Clause |
+| pyasn1-modules | 0.4.2 | BSD (see bundled license) |
+| skops | 0.16.0 | MIT |
+| sqlalchemy | 2.1.6 | MIT |
+| sqlparse | 0.6.1 | BSD-3-Clause |
+| starlette | 1.10.0 | BSD-3-Clause |
+| uvicorn | 0.54.0 | BSD-3-Clause |
+| waitress | 3.0.2 | ZPL-2.1 |
+| werkzeug | 3.1.9 | BSD-3-Clause |
+| xgboost-cpu | 3.4.1 | Apache-2.0 |
+| zipp | 4.1.2 | MIT |

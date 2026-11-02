@@ -170,6 +170,25 @@ def train(config: dict) -> dict:
     return record
 
 
+def classification_metrics(y: pd.Series, predicted: np.ndarray, scores: np.ndarray) -> dict:
+    """Compute shared binary metrics at the caller's explicit decision threshold."""
+    return {
+        "accuracy": accuracy_score(y, predicted),
+        "macro_f1": f1_score(y, predicted, average="macro", zero_division=0),
+        "average_precision": average_precision_score(y, scores),
+        "precision_yes": precision_score(y, predicted, zero_division=0),
+        "recall_yes": recall_score(y, predicted, zero_division=0),
+        "roc_auc": roc_auc_score(y, scores),
+        "brier_score": float(np.mean((scores - y.to_numpy()) ** 2)),
+        "lift_at_10_percent": None
+        if np.ptp(scores) == 0
+        else float(
+            y.iloc[np.argsort(-scores, kind="stable")[: max(1, int(len(y) * 0.1))]].mean()
+            / y.mean()
+        ),
+    }
+
+
 def evaluate(config: dict) -> dict:
     """Evaluate validation only; final test and replay are never loaded here."""
     df, _ = read_partition(config, "validation")
@@ -194,21 +213,7 @@ def evaluate(config: dict) -> dict:
         # Only load artifacts created by this trusted local training process.
         model = joblib.load(path)
         predicted, scores = model.predict(x), model.predict_proba(x)[:, 1]
-        result["models"][name] = {
-            "accuracy": accuracy_score(y, predicted),
-            "macro_f1": f1_score(y, predicted, average="macro", zero_division=0),
-            "average_precision": average_precision_score(y, scores),
-            "precision_yes": precision_score(y, predicted, zero_division=0),
-            "recall_yes": recall_score(y, predicted, zero_division=0),
-            "roc_auc": roc_auc_score(y, scores),
-            "brier_score": float(np.mean((scores - y.to_numpy()) ** 2)),
-            "lift_at_10_percent": None
-            if np.ptp(scores) == 0
-            else float(
-                y.iloc[np.argsort(-scores, kind="stable")[: max(1, int(len(y) * 0.1))]].mean()
-                / y.mean()
-            ),
-        }
+        result["models"][name] = classification_metrics(y, predicted, scores)
         ConfusionMatrixDisplay.from_predictions(y, predicted, labels=[0, 1])
         plt.savefig(reports / f"confusion_matrix_{name}.png")
         plt.close()

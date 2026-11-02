@@ -3,7 +3,15 @@ name = "bank-marketing-mlops"
 version = "0.1.0"
 description = "Reproducible Bank Marketing classification experiment"
 requires-python = ">=3.12,<3.13"
-dependencies = ["pandas>=2.2,<3", "scikit-learn>=1.6,<2", "matplotlib>=3.9,<4", "joblib>=1.4,<2", "pyyaml>=6,<7"]
+dependencies = [
+    "pandas>=2.2,<3",
+    "scikit-learn>=1.6,<2",
+    "matplotlib>=3.9,<4",
+    "joblib>=1.4,<2",
+    "pyyaml>=6,<7",
+    "mlflow>=3,<4",
+    "xgboost-cpu>=3,<4",
+]
 
 [dependency-groups]
 dev = [

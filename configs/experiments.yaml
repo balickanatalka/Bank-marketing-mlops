@@ -1,0 +1,39 @@
+seed: 42
+decision_threshold: 0.5
+models:
+  dummy:
+    strategy: most_frequent
+  logistic:
+    max_iter: 1000
+    C: 1.0
+  logistic_balanced:
+    max_iter: 1000
+    C: 1.0
+    class_weight: balanced
+  random_forest:
+    n_estimators: 100
+    max_depth: 6
+    min_samples_leaf: 20
+    class_weight: balanced
+  hist_gradient_boosting:
+    max_iter: 100
+    learning_rate: 0.08
+    max_leaf_nodes: 15
+    l2_regularization: 1.0
+    class_weight: balanced
+    early_stopping: false
+  xgboost:
+    n_estimators: 150
+    max_depth: 3
+    learning_rate: 0.05
+    min_child_weight: 10
+    subsample: 1.0
+    colsample_bytree: 1.0
+    tree_method: hist
+    device: cpu
+    eval_metric: logloss
+selection:
+  primary_metric: average_precision
+  require_above_dummy: true
+  recall_floor_model: logistic
+  tie_break_order: [logistic, logistic_balanced, random_forest, hist_gradient_boosting, xgboost]
