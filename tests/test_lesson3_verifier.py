@@ -5,6 +5,27 @@ import pytest
 from scripts import verify_lesson3 as verifier
 
 
+def test_legacy_pointer_from_approved_migration(tmp_path, monkeypatch):
+    import hashlib
+
+    monkeypatch.setattr(verifier, "ROOT", tmp_path)
+    evidence = tmp_path / "reports/evidence"
+    evidence.mkdir(parents=True)
+    content = "outs:\n- path: ../data/raw/bank-additional-full.csv\n"
+    record = {
+        "previous_content": content,
+        "previous_path": "metadata/bank-additional-full.csv.dvc",
+        "previous_sha256": hashlib.sha256(content.encode()).hexdigest(),
+    }
+    path = evidence / "lesson4-migration-example.json"
+    path.write_text(json.dumps(record), encoding="utf-8")
+    assert verifier.legacy_pointer_bytes() == content.encode()
+    record["previous_sha256"] = "invalid"
+    path.write_text(json.dumps(record), encoding="utf-8")
+    with pytest.raises(FileNotFoundError):
+        verifier.legacy_pointer_bytes()
+
+
 @pytest.mark.parametrize("change", ["modified", "missing"])
 def test_integrity_failure_overrides_pass(tmp_path, monkeypatch, change):
     monkeypatch.setattr(verifier, "ROOT", tmp_path)

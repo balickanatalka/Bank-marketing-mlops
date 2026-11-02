@@ -11,7 +11,6 @@ import joblib
 import matplotlib
 import numpy as np
 import pandas as pd
-from sklearn.compose import ColumnTransformer
 from sklearn.dummy import DummyClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import (
@@ -24,11 +23,11 @@ from sklearn.metrics import (
     roc_auc_score,
 )
 from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import FunctionTransformer, OneHotEncoder, StandardScaler
 
 from src.config import ROOT, SPLITS
 from src.data.download import ensure_data, verify_manifest
 from src.data.validation import validate_dataframe
+from src.features.build import build_preprocessor, history_features  # noqa: F401
 
 matplotlib.use("Agg")
 from matplotlib import pyplot as plt  # noqa: E402
@@ -45,6 +44,13 @@ def write_json(path: Path, payload: dict) -> None:
 def config_hash(config: dict) -> str:
     """Identify the complete effective configuration, including seed override."""
     return hashlib.sha256(json.dumps(config, sort_keys=True).encode()).hexdigest()
+
+
+def preparation_hash(config: dict) -> str:
+    """Hash only configuration affecting prepared rows, excluding model/seed."""
+    return config_hash(
+        {"data": config["data"], "split": config["split"], "prepared": config["paths"]["prepared"]}
+    )
 
 
 def chronological_split(df: pd.DataFrame, fractions: dict) -> dict[str, pd.DataFrame]:
@@ -82,6 +88,7 @@ def prepare(config: dict) -> dict:
         }
     report["raw_sha256"] = manifest["sha256"]
     report["config_sha256"] = config_hash(config)
+    report["preparation_sha256"] = preparation_hash(config)
     write_json(destination / "metadata.json", report)
     write_json(ROOT / config["paths"]["reports"] / "data_validation.json", report)
     counts = df.y.value_counts()
@@ -99,7 +106,11 @@ def read_partition(config: dict, name: str) -> tuple[pd.DataFrame, dict]:
     metadata = json.loads((base / "metadata.json").read_text(encoding="utf-8"))
     manifest = json.loads((ROOT / config["data"]["manifest"]).read_text(encoding="utf-8"))
     verify_manifest(ROOT / config["data"]["raw"], manifest)
-    if metadata["config_sha256"] != config_hash(config):
+    if (
+        metadata.get("preparation_sha256") != preparation_hash(config)
+        if "preparation_sha256" in metadata
+        else metadata["config_sha256"] != config_hash(config)
+    ):
         raise ValueError("Konfiguracja zmieniła się; uruchom prepare ponownie.")
     if metadata["raw_sha256"] != manifest["sha256"]:
         raise ValueError("Niezgodne pochodzenie przygotowanych danych.")
@@ -107,37 +118,6 @@ def read_partition(config: dict, name: str) -> tuple[pd.DataFrame, dict]:
     if hashlib.sha256(path.read_bytes()).hexdigest() != metadata["splits"][name]["sha256"]:
         raise ValueError("Zmodyfikowany przygotowany zbiór danych.")
     return pd.read_csv(path), metadata
-
-
-def history_features(frame: pd.DataFrame) -> pd.DataFrame:
-    """Treat pdays=999 as no previous contact, rather than 999 elapsed days."""
-    frame = frame.copy()
-    frame["not_previously_contacted"] = (frame.pdays == 999).astype(int)
-    frame["pdays"] = frame.pdays.mask(frame.pdays == 999, 0)
-    return frame
-
-
-def build_preprocessor(features: list[str]) -> Pipeline:
-    """Build one preprocessing path; fitting is performed only by training."""
-    numeric = [c for c in features if c in {"age", "pdays", "previous"}]
-    if "pdays" in features:
-        numeric.append("not_previously_contacted")
-    categorical = [c for c in features if c not in {"age", "pdays", "previous"}]
-    steps = []
-    if "pdays" in features:
-        steps.append(("history", FunctionTransformer(history_features)))
-    steps.append(
-        (
-            "columns",
-            ColumnTransformer(
-                [
-                    ("numeric", StandardScaler(), numeric),
-                    ("categorical", OneHotEncoder(handle_unknown="ignore"), categorical),
-                ]
-            ),
-        )
-    )
-    return Pipeline(steps)
 
 
 def train(config: dict) -> dict:

@@ -1,0 +1,7 @@
+{
+  "status": "APPROVED",
+  "scope": "Delete only legacy DVC metadata, no git rm; download stage owns same CSV",
+  "previous_path": "metadata/bank-additional-full.csv.dvc",
+  "previous_content": "outs:\n- md5: f6cb2c1256ffe2836b36df321f46e92c\n  size: 5834924\n  hash: md5\n  path: ../data/raw/bank-additional-full.csv\n",
+  "previous_sha256": "248a198679e7293d6833e45714ddd4e9e9c1ea8b1eac634039e35ab7cb84e5be"
+}

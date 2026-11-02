@@ -47,7 +47,23 @@ def protected_files() -> dict[str, str]:
         "reports/evidence",
     ]:
         files.extend(p for p in (ROOT / directory).rglob("*") if p.is_file())
-    return {p.relative_to(ROOT).as_posix(): digest(p) for p in files}
+    return {p.relative_to(ROOT).as_posix(): digest(p) for p in files if p.is_file()}
+
+
+def legacy_pointer_bytes() -> bytes:
+    """Recover the approved legacy pointer for an isolated historical checkout."""
+    pointer = ROOT / "metadata/bank-additional-full.csv.dvc"
+    if pointer.exists():
+        return pointer.read_bytes()
+    for path in sorted((ROOT / "reports/evidence").glob("lesson4-migration-*.json"), reverse=True):
+        record = json.loads(path.read_text(encoding="utf-8"))
+        content = record["previous_content"].encode("utf-8")
+        if (
+            record["previous_path"] == "metadata/bank-additional-full.csv.dvc"
+            and hashlib.sha256(content).hexdigest() == record["previous_sha256"]
+        ):
+            return content
+    raise FileNotFoundError("Legacy pointer and approved migration backup are unavailable")
 
 
 def sanitize_output(value: str) -> str:
@@ -230,7 +246,7 @@ def main() -> None:
         )
         pointer = Path("metadata/bank-additional-full.csv.dvc")
         (workspace / pointer).parent.mkdir(parents=True)
-        shutil.copyfile(ROOT / pointer, workspace / pointer)
+        (workspace / pointer).write_bytes(legacy_pointer_bytes())
         shutil.copytree(ROOT / ".dvc/cache", dvc_dir / "cache")
         recovered = workspace / config["data"]["raw"]
         assert not recovered.exists()

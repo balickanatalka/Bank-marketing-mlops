@@ -65,6 +65,38 @@ def test_stages_do_not_consume_holdout(prepared):
     assert result["models"]["model"]["average_precision"] > 0.9
 
 
+def test_model_change_reuses_preparation_but_split_change_fails(prepared):
+    config, root = prepared
+    metadata = root / config["paths"]["prepared"] / "metadata.json"
+    before = metadata.read_bytes()
+    config["model"]["max_iter"] += 1
+    train(config)
+    evaluate(config)
+    assert metadata.read_bytes() == before
+    config["split"]["train"] = 0.5
+    with pytest.raises(ValueError, match="prepare"):
+        train(config)
+
+
+def test_transformers_fit_only_training_rows_and_never_in_evaluation(prepared, monkeypatch):
+    from sklearn.preprocessing import OneHotEncoder, StandardScaler
+
+    config, _ = prepared
+    fitted_rows = []
+    for transformer in [StandardScaler, OneHotEncoder]:
+        original = transformer.fit
+
+        def fit(self, x, y=None, _original=original, **kwargs):
+            fitted_rows.append(len(x))
+            return _original(self, x, y, **kwargs)
+
+        monkeypatch.setattr(transformer, "fit", fit)
+    train(config)
+    assert fitted_rows == [120, 120, 120, 120]
+    evaluate(config)
+    assert fitted_rows == [120, 120, 120, 120]
+
+
 def test_prepare_rejects_corruption_before_parsing(prepared, monkeypatch):
     config, root = prepared
     raw = root / config["data"]["raw"]

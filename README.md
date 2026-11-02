@@ -13,12 +13,13 @@ Nie jest przeznaczony do podejmowania rzeczywistych decyzji finansowych.
 
 | Zaimplementowane | Planowane w kolejnych etapach |
 |---|---|
-| Python, uv, plik blokady zależności i konfiguracja YAML | Pipeline DVC: etapy, zależności i `dvc repro` (zajęcia 4) |
+| Python, uv, plik blokady zależności i konfiguracja YAML | Dalsza automatyzacja jakości i utrzymania |
 | Automatyczne pobieranie UCI, manifest i pełny kontrakt danych | MLflow: eksperymenty, rejestr i pochodzenie modeli |
 | Walidacja danych i podział chronologiczny | API, Docker oraz CI/CD z kontrolami jakości i bezpieczeństwa |
 | Notebook EDA, DummyClassifier i LogisticRegression | Staging, shadow deployment i rollback |
 | Wspólny preprocessing, trening i ewaluacja przez CLI | Monitoring, dryf, SLI/SLO i kontrolowany retraining |
 | Testy pytest, Ruff i lokalne hooki pre-commit | Microsoft RAG z ewaluacją, cytowaniami i tracingiem |
+| Pipeline DVC: download, validate, prepare, train, evaluate; cache i parametry | Feature store tylko przy uzasadnionej potrzebie |
 
 Microsoft RAG będzie rozszerzeniem korzystającym z dokumentacji i raportów MLOps.
 Nie zastępuje klasycznego modelu ani wymagań związanych z jego cyklem życia.
@@ -105,6 +106,29 @@ część nie służy do strojenia ani obliczania przedstawionych metryk modeli.
 
 Cały potok jest zapisywany razem z modelem, aby ponowne użycie nie wymagało
 ręcznego odtwarzania preprocessingu.
+
+Fabryka znajduje się w `src/features/build.py`. Test porównuje przetwarzanie
+wsadowe z pojedynczym rekordem odtworzonym z obiektu JSON oraz predykcje po
+serializacji. API pozostaje przyszłym etapem. Kontrakt odrzuca rzeczywiste null;
+`unknown` jest jawną kategorią, a `nonexistent` opisuje wynik poprzedniej kampanii.
+Nie stosujemy imputacji tych etykiet ani feature store — [ADR](docs/ADR/0001-feature-store.md).
+
+## Pipeline DVC — zajęcia 4
+
+```powershell
+uv run --locked dvc repro
+uv run --locked dvc repro
+uv run --locked python -m scripts.verify_lesson4
+```
+
+`dvc.yaml` używa `configs/lesson4.yaml`, zapisuje nowe wyniki w `data/lesson4/`
+i `artifacts/lesson4/`, a model ocenia wyłącznie na validation. Drugi niezmieniony
+przebieg pomija etapy. Parametr seed zmieniaj w YAML; DVC odrzuca `PROJEKT_SEED`,
+aby zmienne środowiska nie omijały śledzenia parametrów.
+Weryfikator pracuje w nowym katalogu tymczasowym, pobiera CSV z UCI bez kopiowania
+oryginalnych danych/cache i zapisuje unikalny raport `reports/evidence/lesson4-dvc-*.json`.
+Nie uruchamia treningu w głównym workspace. Szczegóły i ograniczenia:
+[odtwarzalność](docs/REPRODUCIBILITY.md).
 
 ## Modele i rzeczywiste wyniki
 

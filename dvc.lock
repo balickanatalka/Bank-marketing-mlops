@@ -1,0 +1,313 @@
+schema: '2.0'
+stages:
+  download:
+    cmd: python -m src.dvc_cli download
+    deps:
+    - path: metadata/data_manifest.json
+      hash: md5
+      md5: f6db5e158a4626c049f95c2f5b9552cc
+      size: 687
+    - path: src/config.py
+      hash: md5
+      md5: 9ad300af8434ddff3df866d2ff76c9fa
+      size: 1794
+    - path: src/data/download.py
+      hash: md5
+      md5: f78733ef2afb41455552a127dc740f34
+      size: 3215
+    - path: src/dvc_cli.py
+      hash: md5
+      md5: 876920e6d2194ebfe6bde9c15f924386
+      size: 1325
+    params:
+      configs/lesson4.yaml:
+        data.manifest: metadata/data_manifest.json
+        data.raw: data/raw/bank-additional-full.csv
+    outs:
+    - path: data/raw/bank-additional-full.csv
+      hash: md5
+      md5: f6cb2c1256ffe2836b36df321f46e92c
+      size: 5834924
+  validate:
+    cmd: python -m src.dvc_cli validate
+    deps:
+    - path: data/raw/bank-additional-full.csv
+      hash: md5
+      md5: f6cb2c1256ffe2836b36df321f46e92c
+      size: 5834924
+    - path: metadata/data_manifest.json
+      hash: md5
+      md5: f6db5e158a4626c049f95c2f5b9552cc
+      size: 687
+    - path: src/config.py
+      hash: md5
+      md5: 9ad300af8434ddff3df866d2ff76c9fa
+      size: 1794
+    - path: src/data
+      hash: md5
+      md5: feed79bd93fe8b635f7f596cc0c111eb.dir
+      size: 7528
+      nfiles: 4
+    - path: src/dvc_cli.py
+      hash: md5
+      md5: 876920e6d2194ebfe6bde9c15f924386
+      size: 1325
+    params:
+      configs/lesson4.yaml:
+        data.manifest: metadata/data_manifest.json
+        data.raw: data/raw/bank-additional-full.csv
+    outs:
+    - path: artifacts/lesson4/validated.json
+      hash: md5
+      md5: b624ff4f87f1f5ff49e2b92ce7f631d6
+      size: 389
+  prepare:
+    cmd: python -m src.dvc_cli prepare
+    deps:
+    - path: artifacts/lesson4/validated.json
+      hash: md5
+      md5: b624ff4f87f1f5ff49e2b92ce7f631d6
+      size: 389
+    - path: data/raw/bank-additional-full.csv
+      hash: md5
+      md5: f6cb2c1256ffe2836b36df321f46e92c
+      size: 5834924
+    - path: metadata/data_manifest.json
+      hash: md5
+      md5: f6db5e158a4626c049f95c2f5b9552cc
+      size: 687
+    - path: src/config.py
+      hash: md5
+      md5: 9ad300af8434ddff3df866d2ff76c9fa
+      size: 1794
+    - path: src/data
+      hash: md5
+      md5: feed79bd93fe8b635f7f596cc0c111eb.dir
+      size: 7528
+      nfiles: 4
+    - path: src/dvc_cli.py
+      hash: md5
+      md5: 876920e6d2194ebfe6bde9c15f924386
+      size: 1325
+    - path: src/pipeline.py
+      hash: md5
+      md5: 21979612fb2cc3041c8dd73b47905ed0
+      size: 9222
+    params:
+      configs/lesson4.yaml:
+        data:
+          raw: data/raw/bank-additional-full.csv
+          manifest: metadata/data_manifest.json
+          target: y
+          features:
+          - age
+          - job
+          - marital
+          - education
+          - default
+          - housing
+          - loan
+          - pdays
+          - previous
+          - poutcome
+        paths.prepared: data/lesson4/processed
+        paths.reports: artifacts/lesson4/reports
+        split:
+          train: 0.6
+          validation: 0.15
+          final_test: 0.1
+          replay: 0.15
+    outs:
+    - path: artifacts/lesson4/reports/class_distribution.png
+      hash: md5
+      md5: 432832f84453d86de02e582c7abe8d90
+      size: 15149
+    - path: artifacts/lesson4/reports/data_validation.json
+      hash: md5
+      md5: f3d38025cc111f1fbfb86b14f4c21177
+      size: 1455
+    - path: data/lesson4/processed
+      hash: md5
+      md5: 704db22e55f375e75f4858a255b8b70e.dir
+      size: 4955231
+      nfiles: 5
+  train:
+    cmd: python -m src.dvc_cli train
+    deps:
+    - path: data/lesson4/processed/metadata.json
+      hash: md5
+      md5: f3d38025cc111f1fbfb86b14f4c21177
+      size: 1455
+    - path: data/lesson4/processed/train.csv
+      hash: md5
+      md5: 2def5d373c2625f541a0c2169efc164c
+      size: 2991813
+    - path: data/raw/bank-additional-full.csv
+      hash: md5
+      md5: f6cb2c1256ffe2836b36df321f46e92c
+      size: 5834924
+    - path: metadata/data_manifest.json
+      hash: md5
+      md5: f6db5e158a4626c049f95c2f5b9552cc
+      size: 687
+    - path: pyproject.toml
+      hash: md5
+      md5: 563c5073c65ce57acedea60a3da77600
+      size: 664
+    - path: src/config.py
+      hash: md5
+      md5: 9ad300af8434ddff3df866d2ff76c9fa
+      size: 1794
+    - path: src/data
+      hash: md5
+      md5: feed79bd93fe8b635f7f596cc0c111eb.dir
+      size: 7528
+      nfiles: 4
+    - path: src/dvc_cli.py
+      hash: md5
+      md5: 876920e6d2194ebfe6bde9c15f924386
+      size: 1325
+    - path: src/features
+      hash: md5
+      md5: 747f7974616b425772a490d0b28e0399.dir
+      size: 1817
+      nfiles: 2
+    - path: src/pipeline.py
+      hash: md5
+      md5: 21979612fb2cc3041c8dd73b47905ed0
+      size: 9222
+    - path: uv.lock
+      hash: md5
+      md5: 005534af4699fff3d07d95086b84ac08
+      size: 245037
+    params:
+      configs/lesson4.yaml:
+        data:
+          raw: data/raw/bank-additional-full.csv
+          manifest: metadata/data_manifest.json
+          target: y
+          features:
+          - age
+          - job
+          - marital
+          - education
+          - default
+          - housing
+          - loan
+          - pdays
+          - previous
+          - poutcome
+        model:
+          max_iter: 1000
+        paths:
+          prepared: data/lesson4/processed
+          models: artifacts/lesson4/models
+          reports: artifacts/lesson4/reports
+        seed: 42
+        split:
+          train: 0.6
+          validation: 0.15
+          final_test: 0.1
+          replay: 0.15
+    outs:
+    - path: artifacts/lesson4/models
+      hash: md5
+      md5: 984eda17a38b9e68b345c1de4c5dfba5.dir
+      size: 13701
+      nfiles: 3
+  evaluate:
+    cmd: python -m src.dvc_cli evaluate
+    deps:
+    - path: artifacts/lesson4/models
+      hash: md5
+      md5: 984eda17a38b9e68b345c1de4c5dfba5.dir
+      size: 13701
+      nfiles: 3
+    - path: data/lesson4/processed/metadata.json
+      hash: md5
+      md5: f3d38025cc111f1fbfb86b14f4c21177
+      size: 1455
+    - path: data/lesson4/processed/validation.csv
+      hash: md5
+      md5: ff481a3967f636fae3e2dcd14e6783e6
+      size: 737869
+    - path: data/raw/bank-additional-full.csv
+      hash: md5
+      md5: f6cb2c1256ffe2836b36df321f46e92c
+      size: 5834924
+    - path: metadata/data_manifest.json
+      hash: md5
+      md5: f6db5e158a4626c049f95c2f5b9552cc
+      size: 687
+    - path: pyproject.toml
+      hash: md5
+      md5: 563c5073c65ce57acedea60a3da77600
+      size: 664
+    - path: src/config.py
+      hash: md5
+      md5: 9ad300af8434ddff3df866d2ff76c9fa
+      size: 1794
+    - path: src/data
+      hash: md5
+      md5: feed79bd93fe8b635f7f596cc0c111eb.dir
+      size: 7528
+      nfiles: 4
+    - path: src/dvc_cli.py
+      hash: md5
+      md5: 876920e6d2194ebfe6bde9c15f924386
+      size: 1325
+    - path: src/features
+      hash: md5
+      md5: 747f7974616b425772a490d0b28e0399.dir
+      size: 1817
+      nfiles: 2
+    - path: src/pipeline.py
+      hash: md5
+      md5: 21979612fb2cc3041c8dd73b47905ed0
+      size: 9222
+    - path: uv.lock
+      hash: md5
+      md5: 005534af4699fff3d07d95086b84ac08
+      size: 245037
+    params:
+      configs/lesson4.yaml:
+        data:
+          raw: data/raw/bank-additional-full.csv
+          manifest: metadata/data_manifest.json
+          target: y
+          features:
+          - age
+          - job
+          - marital
+          - education
+          - default
+          - housing
+          - loan
+          - pdays
+          - previous
+          - poutcome
+        model:
+          max_iter: 1000
+        paths:
+          prepared: data/lesson4/processed
+          models: artifacts/lesson4/models
+          reports: artifacts/lesson4/reports
+        seed: 42
+        split:
+          train: 0.6
+          validation: 0.15
+          final_test: 0.1
+          replay: 0.15
+    outs:
+    - path: artifacts/lesson4/reports/confusion_matrix_dummy.png
+      hash: md5
+      md5: 17f9170b1319b91ee02cbb041feeb84e
+      size: 13805
+    - path: artifacts/lesson4/reports/confusion_matrix_model.png
+      hash: md5
+      md5: 19af12dc5025966dea5103f105cbb6af
+      size: 13208
+    - path: artifacts/lesson4/reports/metrics.json
+      hash: md5
+      md5: 6223c717f3dc034fd9fa8b64c6cebdc0
+      size: 3360

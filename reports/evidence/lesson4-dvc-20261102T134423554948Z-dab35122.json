@@ -1,0 +1,102 @@
+{
+  "status": "PASS",
+  "workspace": "bank-lesson4-20261102T134423554948Z-dab35122-tuwi0scn",
+  "commands": [
+    {
+      "command": [
+        "python",
+        "-m",
+        "dvc",
+        "repro"
+      ],
+      "exit_code": 0,
+      "stdout": "Running stage 'download':\n> python -m src.dvc_cli download\nGenerating lock file 'dvc.lock'\nUpdating lock file 'dvc.lock'\n\nRunning stage 'validate':\n> python -m src.dvc_cli validate\nUpdating lock file 'dvc.lock'\n\nRunning stage 'prepare':\n> python -m src.dvc_cli prepare\nUpdating lock file 'dvc.lock'\n\nRunning stage 'train':\n> python -m src.dvc_cli train\nUpdating lock file 'dvc.lock'\n\nRunning stage 'evaluate':\n> python -m src.dvc_cli evaluate\nUpdating lock file 'dvc.lock'\nUse `dvc push` to send your updates to remote storage.\n",
+      "stderr": "",
+      "expected_failure": false
+    },
+    {
+      "command": [
+        "python",
+        "-m",
+        "dvc",
+        "repro"
+      ],
+      "exit_code": 0,
+      "stdout": "Stage 'download' didn't change, skipping\nStage 'validate' didn't change, skipping\nStage 'prepare' didn't change, skipping\nStage 'train' didn't change, skipping\nStage 'evaluate' didn't change, skipping\nData and pipelines are up to date.\n",
+      "stderr": "",
+      "expected_failure": false
+    },
+    {
+      "command": [
+        "python",
+        "-m",
+        "dvc",
+        "status"
+      ],
+      "exit_code": 0,
+      "stdout": "Data and pipelines are up to date.\n",
+      "stderr": "",
+      "expected_failure": false
+    },
+    {
+      "command": [
+        "python",
+        "-m",
+        "dvc",
+        "repro"
+      ],
+      "exit_code": 0,
+      "stdout": "Stage 'download' didn't change, skipping\nStage 'validate' didn't change, skipping\nStage 'prepare' didn't change, skipping\nRunning stage 'train':\n> python -m src.dvc_cli train\nUpdating lock file 'dvc.lock'\n\nRunning stage 'evaluate':\n> python -m src.dvc_cli evaluate\nUpdating lock file 'dvc.lock'\nUse `dvc push` to send your updates to remote storage.\n",
+      "stderr": "",
+      "expected_failure": false
+    },
+    {
+      "command": [
+        "python",
+        "-m",
+        "dvc",
+        "repro",
+        "--single-item",
+        "validate"
+      ],
+      "exit_code": 255,
+      "stdout": "Running stage 'validate':\n> python -m src.dvc_cli validate\n",
+      "stderr": "Traceback (most recent call last):\n  File \"<frozen runpy>\", line 198, in _run_module_as_main\n  File \"<frozen runpy>\", line 88, in _run_code\n  File \"USER_HOME\\AppData\\Local\\Temp\\bank-lesson4-20261102T134423554948Z-dab35122-tuwi0scn\\src\\dvc_cli.py\", line 33, in <module>\n    main()\n  File \"USER_HOME\\AppData\\Local\\Temp\\bank-lesson4-20261102T134423554948Z-dab35122-tuwi0scn\\src\\dvc_cli.py\", line 25, in main\n    ensure_data(ROOT LOCAL_PATH\"data\"][\"raw\"], ROOT LOCAL_PATH\"data\"][\"manifest\"])\n  File \"USER_HOME\\AppData\\Local\\Temp\\bank-lesson4-20261102T134423554948Z-dab35122-tuwi0scn\\src\\data\\download.py\", line 54, in ensure_data\n    verify_manifest(path, manifest)\n  File \"USER_HOME\\AppData\\Local\\Temp\\bank-lesson4-20261102T134423554948Z-dab35122-tuwi0scn\\src\\data\\download.py\", line 21, in verify_manifest\n    raise ValueError(\"SHA-256 CSV nie zgadza się z przypiętym manifestem.\")\nValueError: SHA-256 CSV nie zgadza się z przypiętym manifestem.\nERROR: failed to reproduce 'validate': failed to run: python -m src.dvc_cli validate, exited with 1\n",
+      "expected_failure": true
+    }
+  ],
+  "checks": {
+    "first_run_all_stages": true,
+    "validation_only": true,
+    "second_run_no_execution": true,
+    "model_parameter_only_train_evaluate": true,
+    "corrupt_data_rejected_no_training": true
+  },
+  "download": "UCI, no original CSV/cache copied",
+  "validation_metrics": {
+    "dummy": {
+      "accuracy": 0.871479443185497,
+      "macro_f1": 0.4656633800380557,
+      "average_precision": 0.12852055681450308,
+      "precision_yes": 0.0,
+      "recall_yes": 0.0,
+      "roc_auc": 0.5,
+      "brier_score": 0.12852055681450308,
+      "lift_at_10_percent": null
+    },
+    "model": {
+      "accuracy": 0.8706701197798641,
+      "macro_f1": 0.47400036592413053,
+      "average_precision": 0.18504639379371762,
+      "precision_yes": 0.3684210526315789,
+      "recall_yes": 0.008816120906801008,
+      "roc_auc": 0.5721377783225603,
+      "brier_score": 0.11827509073529083,
+      "lift_at_10_percent": 1.8411751017558755
+    }
+  },
+  "root_lock_matches_baseline": false,
+  "lock_sha256": "0e4134bd93bca5c9c07cb15bcc573daf7b4962855bd1254662f453e8d90cfac3",
+  "protected_files_unchanged": true,
+  "protected_file_count": 180
+}

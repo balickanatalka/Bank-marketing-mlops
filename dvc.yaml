@@ -1,0 +1,81 @@
+stages:
+  download:
+    cmd: python -m src.dvc_cli download
+    deps:
+      - src/data/download.py
+      - src/dvc_cli.py
+      - src/config.py
+      - metadata/data_manifest.json
+    params:
+      - configs/lesson4.yaml: [data.raw, data.manifest]
+    outs:
+      - data/raw/bank-additional-full.csv
+  validate:
+    cmd: python -m src.dvc_cli validate
+    deps:
+      - src/data
+      - src/dvc_cli.py
+      - src/config.py
+      - metadata/data_manifest.json
+      - data/raw/bank-additional-full.csv
+    params:
+      - configs/lesson4.yaml: [data.raw, data.manifest]
+    outs:
+      - artifacts/lesson4/validated.json
+  prepare:
+    cmd: python -m src.dvc_cli prepare
+    deps:
+      - src/pipeline.py
+      - src/config.py
+      - src/data
+      - src/dvc_cli.py
+      - metadata/data_manifest.json
+      - data/raw/bank-additional-full.csv
+      - artifacts/lesson4/validated.json
+    params:
+      - configs/lesson4.yaml: [data, split, paths.prepared, paths.reports]
+    outs:
+      - data/lesson4/processed
+      - artifacts/lesson4/reports/data_validation.json
+      - artifacts/lesson4/reports/class_distribution.png
+  train:
+    cmd: python -m src.dvc_cli train
+    deps:
+      - src/pipeline.py
+      - src/config.py
+      - src/features
+      - src/data
+      - src/dvc_cli.py
+      - pyproject.toml
+      - uv.lock
+      - metadata/data_manifest.json
+      - data/raw/bank-additional-full.csv
+      - data/lesson4/processed/train.csv
+      - data/lesson4/processed/metadata.json
+    params:
+      - configs/lesson4.yaml: [data, split, seed, model, paths]
+    outs:
+      - artifacts/lesson4/models
+  evaluate:
+    cmd: python -m src.dvc_cli evaluate
+    deps:
+      - src/pipeline.py
+      - src/config.py
+      - src/features
+      - src/data
+      - src/dvc_cli.py
+      - pyproject.toml
+      - uv.lock
+      - metadata/data_manifest.json
+      - data/raw/bank-additional-full.csv
+      - data/lesson4/processed/validation.csv
+      - data/lesson4/processed/metadata.json
+      - artifacts/lesson4/models
+    params:
+      - configs/lesson4.yaml: [data, split, seed, model, paths]
+    metrics:
+      - artifacts/lesson4/reports/metrics.json:
+          cache: true
+    outs:
+      - artifacts/lesson4/reports/confusion_matrix_dummy.png
+      - artifacts/lesson4/reports/confusion_matrix_model.png
