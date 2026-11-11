@@ -14,6 +14,27 @@ def dense(value):
     return value.toarray() if hasattr(value, "toarray") else value
 
 
+def test_preprocessing_scales_age_and_encodes_known_and_unseen_jobs():
+    train = pd.DataFrame({"age": [20, 40], "job": ["admin.", "unknown"]})
+    preprocessor = build_preprocessor(list(train)).fit(train)
+    batch = pd.DataFrame({"age": [20, 30, 40], "job": ["admin.", "unseen", "unknown"]})
+    original = batch.copy()
+
+    np.testing.assert_allclose(
+        dense(preprocessor.transform(batch)),
+        [[-1, 1, 0], [0, 0, 0], [1, 0, 1]],
+    )
+    pd.testing.assert_frame_equal(batch, original)
+
+
+@pytest.mark.parametrize("age", ["bad", float("inf")])
+def test_preprocessing_rejects_invalid_numeric_values(age):
+    preprocessor = build_preprocessor(["age"]).fit(pd.DataFrame({"age": [20, 40]}))
+
+    with pytest.raises(ValueError):
+        preprocessor.transform(pd.DataFrame({"age": [age]}))
+
+
 def test_batch_single_record_determinism_and_serialization():
     frame = pd.DataFrame(
         {

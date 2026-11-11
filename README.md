@@ -309,6 +309,17 @@ Hooki używają Ruff z wersji zapisanej w `uv.lock`. `--all-files` obejmuje plik
 przed ich dodaniem skrypt `verify_checks.py` sprawdza pliki jawnie przez `--files`.
 Instalacja hooka zmienia wyłącznie lokalne `.git/hooks`.
 
+## Strategia testów — zajęcia 6
+
+Testy obejmują preprocessing, walidację danych, zgodność train/serve, kontrakt
+predykcji i bramkę Average Precision z kontrolą negatywną Dummy. Dwa testy
+Hypothesis sprawdzają prawdopodobieństwa i kształty dla generowanych partii.
+Testy syntetyczne działają bez UCI. Bramkę jakości na rzeczywistej walidacji
+uruchom z plikiem CSV zweryfikowanym przez manifest, zgodnie ze strategią testów.
+
+- [Strategia testów i odwzorowanie wymagań](docs/TEST_STRATEGY.md)
+- [Raport wyników zajęć 6](reports/lesson6_test_results.md)
+
 ## Sprawdzenie odtwarzalności
 
 Kontrola odtwarzalności wymaga wcześniejszego poprawnego wykonania `all`:

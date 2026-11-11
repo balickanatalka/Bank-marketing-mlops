@@ -1,13 +1,23 @@
 import hashlib
 import json
 
+import joblib
+import numpy as np
 import pandas as pd
 import pytest
 
 from src.config import load_config
 from src.data.schema import CATEGORIES
 from src.data.validation import CATEGORICAL, NUMERIC, validate_dataframe
-from src.pipeline import evaluate, prepare, train
+from src.pipeline import evaluate, prepare, read_partition, train
+
+MIN_SYNTHETIC_VALIDATION_AP = 0.90
+
+
+def assert_quality(average_precision):
+    assert average_precision >= MIN_SYNTHETIC_VALIDATION_AP, (
+        f"Validation AP {average_precision:.3f} below {MIN_SYNTHETIC_VALIDATION_AP:.2f}"
+    )
 
 
 def test_report_output_removes_local_paths():
@@ -62,7 +72,42 @@ def test_stages_do_not_consume_holdout(prepared):
     result = evaluate(config)
     assert result["evaluation_split"] == "validation"
     assert not result["final_test_evaluated"]
-    assert result["models"]["model"]["average_precision"] > 0.9
+    assert_quality(result["models"]["model"]["average_precision"])
+    with pytest.raises(AssertionError, match=r"Validation AP 0\.500 below 0\.90"):
+        assert_quality(result["models"]["dummy"]["average_precision"])
+
+
+def test_saved_pipeline_prediction_contract(prepared):
+    config, root = prepared
+    train(config)
+    model = joblib.load(root / config["paths"]["models"] / "model.joblib")
+    validation, _ = read_partition(config, "validation")
+    fields = config["data"]["features"]
+    batch = validation.loc[:2, fields]
+    records = json.loads(batch.to_json(orient="records"))
+    serving = pd.DataFrame.from_records(records)
+
+    assert list(model.feature_names_in_) == list(serving) == fields
+    assert {"duration", "y"}.isdisjoint(fields)
+    for record in records:
+        for field, value in record.items():
+            assert type(value) is (int if field in NUMERIC else str)
+
+    predictions = model.predict(serving)
+    probabilities = model.predict_proba(serving)
+    np.testing.assert_array_equal(model.classes_, [0, 1])
+    assert predictions.shape == (len(records),)
+    assert np.issubdtype(predictions.dtype, np.integer)
+    assert np.isin(predictions, model.classes_).all()
+    assert probabilities.shape == (len(records), 2)
+    assert np.issubdtype(probabilities.dtype, np.floating)
+    assert np.isfinite(probabilities).all()
+    assert ((0 <= probabilities) & (probabilities <= 1)).all()
+    np.testing.assert_allclose(probabilities.sum(axis=1), 1)
+    np.testing.assert_allclose(model.predict_proba(batch), probabilities)
+
+    with pytest.raises(ValueError, match="age"):
+        model.predict_proba(serving.drop(columns="age"))
 
 
 def test_model_change_reuses_preparation_but_split_change_fails(prepared):
