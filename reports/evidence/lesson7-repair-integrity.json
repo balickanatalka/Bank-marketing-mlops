@@ -1,0 +1,25 @@
+{
+  "status": "PASS",
+  "baseline_files": 501,
+  "authorized_changed_files": [
+    ".git/info/exclude",
+    "reports/evidence/lesson7-repair-checks.json",
+    "reports/evidence/lesson7-repair-reproduction.json",
+    "reports/lesson7_registry.pl.md"
+  ],
+  "unexpected_changes": [],
+  "private_documents_unchanged": true,
+  "private_documents_ignored_locally": true,
+  "private_documents_index_entries": 0,
+  "private_documents_history_entries": 0,
+  "local_commit_objects_checked": 8,
+  "public_gitignore_unchanged": true,
+  "index_unchanged": true,
+  "staged_diff_empty": true,
+  "main_registry_aliases": {
+    "challenger": 1
+  },
+  "historical_data_models_reports_private_plans_unchanged": true,
+  "notebooks_01_02_dvc_lock_unchanged": true,
+  "head": "5349aead0c6bd4df3a58f3cb22d987098807cb59"
+}

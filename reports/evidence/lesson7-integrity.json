@@ -1,0 +1,21 @@
+{
+  "status": "PASS",
+  "baseline_files": 317,
+  "intentionally_changed": [
+    "README.md",
+    "docs/ARCHITECTURE.md",
+    "docs/MODEL_CARD.md",
+    "docs/TEST_STRATEGY.md"
+  ],
+  "unexpected": [],
+  "protected_notebooks_sha256": {
+    "notebooks/01_bank_marketing_eda.ipynb": "bde4cafc0f78de987ff3aff2edd20e8b5002fc80781574b56292b57ba7f0bbc9",
+    "notebooks/02_model_experiments.ipynb": "bd78b3c47a88534bbf4894ea323573ed2c08a2b75b020c088ee4b76439f379e8"
+  },
+  "head": "5349aead0c6bd4df3a58f3cb22d987098807cb59",
+  "staged_diff_empty": true,
+  "final_registry_aliases": {
+    "challenger": "1"
+  },
+  "historical_assets_unchanged": true
+}

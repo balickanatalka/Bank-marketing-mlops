@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "source_batch": "20261102T151844551437Z-c472392b",
+  "source_run_id": "1727e138843c4ec8aacc5990124148c6",
+  "source_git_sha": "e5dc1b36941098255e87c371cb9b372b797a4932",
+  "source_working_tree_dirty": true,
+  "model_name": "bank-marketing-validation",
+  "model_version": "1",
+  "packaging_run_id": "5207855030e443d19050bf6c27dbd9a8",
+  "manifest_sha256": "bc0f24e9ab26ed9049fbb37ca202c8fe8cabe0ab585b3b1de86decfe8fbe5c08",
+  "raw_sha256": "74adfc578bf77a7ff4bb1ba4a9f8709d9e3c6907342959c2c8416847e0afb4d8",
+  "preprocessing_sha256": "72438cd19af8b74f1d8dfe727c2811155ce4c0c11b40dc8bddedb932231694a6",
+  "aliases": {
+    "challenger": "1"
+  },
+  "quality_decision": {
+    "eligible": true,
+    "version": "1",
+    "champion": null,
+    "average_precision": 0.18504639379371762,
+    "recall_yes": 0.008816120906801008,
+    "deployed": false
+  },
+  "roundtrip_predictions_equal": true,
+  "historical_training_repeated": false,
+  "final_test_evaluated": false,
+  "replay_evaluated": false,
+  "deployed": false,
+  "packaging_source_sha256": "a99726f4492222b3bb11ba06a5ed87375a3559b4508bb2a4a7281a9572df7703",
+  "registry_directory": "artifacts/lesson7/20261111T132828040841Z-470c054e/registry"
+}

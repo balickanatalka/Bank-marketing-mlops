@@ -84,3 +84,22 @@ Test ponownie weryfikuje SHA-256, rozmiar i wymiary pliku. Brak zmiennej daje
 jawny `SKIP`. Wskazanie nieistniejącego lub zmienionego pliku powoduje
 `FAIL`. Aby włączyć bramkę do pełnego przebiegu, uruchom w tej samej sesji
 `uv run --locked pytest -q`.
+
+## Rejestr modeli — zajęcia 7
+
+`tests/test_registry.py` korzysta wyłącznie z tymczasowych eksperymentów,
+syntetycznych danych, pakietów i osobnych baz SQLite. Pokrywa zapis/odczyt,
+zgodność klas i prawdopodobieństw, rosnące wersje, rozwiązywanie aliasu,
+lineage i generowanie Model Card. Kontrole negatywne obejmują brak metryk,
+null/NaN, regresję względem championa, schemat i domenę wejścia, zmianę runu,
+plików, manifestu i metadanych, niezgodną partycję oraz brak zgody operatora.
+Promocja i rollback (także powrót do braku championa) odbywają się wyłącznie
+w bazach testowych. Lokalna blokada ma osobny test konfliktu piszących.
+
+```powershell
+uv run --locked pytest tests/test_registry.py -q
+```
+
+Bramka UCI z zajęć 6 pozostaje częścią pełnego pytest po ustawieniu
+`BANK_MARKETING_QUALITY_CSV`. Dowody zajęć 7 i czasy wykonania:
+[raport rejestru](../reports/lesson7_registry.pl.md).

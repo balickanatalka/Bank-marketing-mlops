@@ -1,7 +1,7 @@
 # Architektura eksperymentu
 
-Eksperyment jest lokalnym programem Python. Nie uruchamia API, rejestru modeli,
-usług monitoringu ani LLM. Notebook i CLI korzystają z tej samej implementacji.
+Eksperyment jest lokalnym programem Python z osobnym lokalnym rejestrem MLflow.
+Nie uruchamia API, usług monitoringu ani LLM. Notebook i CLI korzystają z tej samej implementacji.
 
 ```text
 UCI ZIP -> CSV -> SHA-256 -> walidacja -> podział chronologiczny
@@ -22,7 +22,7 @@ niezgodność wejść; hash modelu jest sprawdzany przed deserializacją. Mechan
 nie zastępuje uwierzytelnienia artefaktów i wymaga zaufanego lokalnego treningu.
 Final test i replay są rozdzielone od części używanych do treningu i walidacji.
 
-Kierunki rozwoju obejmują rejestr modeli, API, kontenery, CI/CD, monitoring i retraining.
+Kierunki rozwoju obejmują API, kontenery, CI/CD, monitoring i retraining.
 Microsoft RAG ma korzystać z dokumentacji i raportów, nie obliczać predykcji ani
 samodzielnie promować modeli. Wymienione przyszłe usługi nie są obecnie zaimplementowane.
 
@@ -56,3 +56,16 @@ Interfejs działa wyłącznie na localhost. Nie ma zdalnego trackingu, registry 
 do małego snapshotu JSON oraz Markdown. Notebook `02_model_experiments.ipynb` odczytuje
 ten snapshot; nie implementuje treningu. Pełne modele i krzywe pozostają lokalne.
 Microsoft RAG pozostaje przyszłym konsumentem dokumentacji i raportów.
+
+## Rejestr modeli — zajęcia 7
+
+`src/registry.py` pakuje istniejący Pipeline z zajęć 5 do formatu MLflow/skops,
+sprawdza odtworzenie metryk validation i tworzy wersję w osobnej bazie SQLite.
+`register` nie przypisuje aliasu. `challenger`, kontrola jakości, zatwierdzona
+promocja `champion` i rollback są osobnymi operacjami. W rejestrze projektu
+pozostawiono tylko challenger; zmiany championa wykonywano w bazach testowych.
+
+Manifest wiąże artefakty, schemat i lineage; wersja rejestru wskazuje run pakowania
+oraz oryginalny run treningowy. Nie powstaje nowy model ani nowy preprocessing.
+`src/model_card.py` generuje kartę z tych samych metadanych. Procedury i ograniczenia
+lokalnej blokady aliasów opisuje [instrukcja rejestru](MODEL_REGISTRY.pl.md).

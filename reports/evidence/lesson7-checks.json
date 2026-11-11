@@ -1,0 +1,201 @@
+{
+  "ruff_check": {
+    "command": [
+      "uv",
+      "run",
+      "--locked",
+      "--no-sync",
+      "ruff",
+      "check",
+      "."
+    ],
+    "exit_code": 0,
+    "status": "PASS",
+    "log": "artifacts/lesson7/controls-final/ruff_check.log"
+  },
+  "ruff_format": {
+    "command": [
+      "uv",
+      "run",
+      "--locked",
+      "--no-sync",
+      "ruff",
+      "format",
+      "--check",
+      "."
+    ],
+    "exit_code": 0,
+    "status": "PASS",
+    "log": "artifacts/lesson7/controls-final/ruff_format.log"
+  },
+  "pre_commit": {
+    "command": [
+      "uv",
+      "run",
+      "--locked",
+      "--no-sync",
+      "pre-commit",
+      "run",
+      "--files",
+      "src/registry.py",
+      "src/model_card.py",
+      "scripts/verify_lesson7.py",
+      "scripts/lineage.py",
+      "tests/test_registry.py",
+      "notebooks/03_model_registry.ipynb"
+    ],
+    "exit_code": 0,
+    "status": "PASS",
+    "log": "artifacts/lesson7/controls-final/pre_commit.log"
+  },
+  "uv_lock": {
+    "command": [
+      "uv",
+      "lock",
+      "--check",
+      "--offline"
+    ],
+    "exit_code": 0,
+    "status": "PASS",
+    "log": "artifacts/lesson7/controls-final/uv_lock.log"
+  },
+  "dependencies": {
+    "command": [
+      "uv",
+      "pip",
+      "check"
+    ],
+    "exit_code": 0,
+    "status": "PASS",
+    "log": "artifacts/lesson7/controls-final/dependencies.log"
+  },
+  "dvc_dag": {
+    "command": [
+      "uv",
+      "run",
+      "--locked",
+      "--no-sync",
+      "dvc",
+      "dag",
+      "--dot"
+    ],
+    "exit_code": 0,
+    "status": "PASS",
+    "log": "artifacts/lesson7/controls-final/dvc_dag.log"
+  },
+  "dvc_status": {
+    "command": [
+      "uv",
+      "run",
+      "--locked",
+      "--no-sync",
+      "dvc",
+      "status",
+      "--json"
+    ],
+    "exit_code": 0,
+    "status": "WARN",
+    "log": "artifacts/lesson7/controls-final/dvc_status.log",
+    "details": {
+      "validate": [
+        {
+          "changed outs": {
+            "artifacts\\lesson4\\validated.json": "not in cache"
+          }
+        }
+      ],
+      "prepare": [
+        {
+          "changed deps": {
+            "src\\pipeline.py": "modified",
+            "artifacts\\lesson4\\validated.json": "deleted"
+          }
+        },
+        {
+          "changed outs": {
+            "data\\lesson4\\processed": "not in cache",
+            "artifacts\\lesson4\\reports\\data_validation.json": "not in cache",
+            "artifacts\\lesson4\\reports\\class_distribution.png": "not in cache"
+          }
+        }
+      ],
+      "train": [
+        {
+          "changed deps": {
+            "src\\pipeline.py": "modified",
+            "pyproject.toml": "modified",
+            "uv.lock": "modified",
+            "data\\lesson4\\processed\\train.csv": "deleted",
+            "data\\lesson4\\processed\\metadata.json": "deleted"
+          }
+        },
+        {
+          "changed outs": {
+            "artifacts\\lesson4\\models": "not in cache"
+          }
+        }
+      ],
+      "evaluate": [
+        {
+          "changed deps": {
+            "src\\pipeline.py": "modified",
+            "pyproject.toml": "modified",
+            "uv.lock": "modified",
+            "data\\lesson4\\processed\\validation.csv": "deleted",
+            "data\\lesson4\\processed\\metadata.json": "deleted",
+            "artifacts\\lesson4\\models": "deleted"
+          }
+        },
+        {
+          "changed outs": {
+            "artifacts\\lesson4\\reports\\confusion_matrix_dummy.png": "not in cache",
+            "artifacts\\lesson4\\reports\\confusion_matrix_model.png": "not in cache",
+            "artifacts\\lesson4\\reports\\metrics.json": "not in cache"
+          }
+        }
+      ]
+    }
+  },
+  "pytest": {
+    "status": "PASS",
+    "command": [
+      ".venv/Scripts/python.exe",
+      "-m",
+      "pytest",
+      "-q",
+      "--basetemp",
+      "artifacts/lesson7/pytest-full-1"
+    ],
+    "passed": 105,
+    "registry_tests": 31,
+    "skipped": 0,
+    "seconds": 151.51,
+    "warnings": [
+      "SQLAlchemy noload deprecated",
+      "MLflow integer signature: nulls rejected by contract"
+    ],
+    "uci_quality_enabled": true,
+    "log": "artifacts/lesson7/pytest-full-1.log",
+    "log_sha256": "26696ef4c6e0a559f8af226c763720a763ea137415b4107e1e9561cd3da29c23"
+  },
+  "notebook": {
+    "status": "PASS",
+    "path": "notebooks/03_model_registry.ipynb",
+    "executed_code_cells": 4,
+    "warnings": [
+      "Windows Proactor/ZMQ selector fallback",
+      "Jupyter profile permissions in sandbox",
+      "Jupyter local kernel TCP transport warning"
+    ],
+    "absolute_paths_redacted": true
+  },
+  "model_card": {
+    "status": "PASS",
+    "generated_from_verified_lineage": true,
+    "test": "tests/test_registry.py::test_generated_card_uses_lineage_and_alias_resolution"
+  },
+  "reproducibility": {
+    "status": "PASS",
+    "scope": "local existing pipeline, validation fingerprint, recalculated metrics, class/probability serialization equality; no retraining or remote recovery"
+  }
+}

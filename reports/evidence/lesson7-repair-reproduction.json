@@ -1,0 +1,86 @@
+{
+  "status": "PASS",
+  "working_tree_overlay": true,
+  "remote_clone_verified": false,
+  "same_machine_only": true,
+  "fresh_venv": true,
+  "existing_uv_cache_used": false,
+  "old_data_models_or_mlflow_copied": false,
+  "workspace_directory": "artifacts/lesson7/public-20261111T150401795662Z/reproduction-network/worktree",
+  "logs_directory": "artifacts/lesson7/public-20261111T150401795662Z/reproduction-network",
+  "private_documents_required": false,
+  "source_read_guard_targets": 7,
+  "source_read_guard_self_test": true,
+  "steps": [
+    {
+      "step": "clone",
+      "exit_code": 0,
+      "log_sha256": "855073e2f9ec7c778fb779c974ceb40d04bcfe0bcadaf09ce84ab37a311ead66"
+    },
+    {
+      "step": "sync",
+      "exit_code": 0,
+      "log_sha256": "37db6af4e19a8b98948c22cf41f92e1a152dc200ab81d6f1e57c663fab189ed5"
+    },
+    {
+      "step": "child_source_guard",
+      "exit_code": 0,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "step": "rebuild",
+      "exit_code": 0,
+      "log_sha256": "479db69a416fcff6a795f41398c036c3407e96f61cb9df2e41cc2dfb9c6c6467"
+    },
+    {
+      "step": "isolated_demo",
+      "exit_code": 0,
+      "log_sha256": "a82db4b8cddd1280ff08e3e67d77eecef1229438696de42d2cb64d17ef51e438"
+    },
+    {
+      "step": "pytest_with_uci",
+      "exit_code": 0,
+      "log_sha256": "32d9fdfd2b8e31b51ffc6b5c415563ae84ec6294a9fa01c65b9e76edafe217a5"
+    }
+  ],
+  "overlay_sha256": {
+    "README.md": "5265578c30adf78c01fb31db60ddd9e9ec2e16c83b02bb1df055b63e9048c870",
+    "pyproject.toml": "00f99099163b9316ef910d1cca3559099f1ad9e73ae03cf0b498df50433a9b13",
+    "uv.lock": "da61ce1f936291d9587296b632d541af076a9159246f9a45f876224c56a3e334",
+    "docs/ARCHITECTURE.md": "71d1bd14ac14858f3de361c27adf3d5764b3ed8afb745c66928698867f467168",
+    "docs/MODEL_CARD.md": "c362a144dce3ad1187d8b39973e4cbf742392ac1e9b7829f0756ecd2e82546e2",
+    "docs/MODEL_REGISTRY.pl.md": "65772a687a095354cede67ea736fcef6240e25b8eb1850ca7145eaa4c83ee74e",
+    "docs/TEST_STRATEGY.md": "82be791bd01d4e6403250f00526b41841ad326f064ce8bb01ec42d73b2af6bb1",
+    "docs/THIRD_PARTY_NOTICES.md": "ac76a9866fa4e60fa4674229a4e2c350c5be003407f76c6f582ff4b1dc7a7f46",
+    "notebooks/03_model_registry.ipynb": "b67fb8a7954497ae8ccacae6619a0af07f08500079d9a8a05bd921c10331e625",
+    "scripts/lineage.py": "4d93e78390c002e45e40c97f600ae0037e22ece6eed0898143318714d21e9949",
+    "scripts/verify_lesson7.py": "79f6283267bd4bf7de0a562c7dd2aa106265edb77f22e0ff0713b8214c918b8b",
+    "scripts/demo_lesson7.py": "00160c8c791cedc4dd3726772ec904e553ea17dc12f9070cf3411fcc6968b46e",
+    "scripts/reproduce_lesson7.py": "1c2f8593ee28f7810bf72026450eafc93723c455ad683f6a612c35b192a1591f",
+    "src/model_card.py": "46b161095b42199d75e1abc7efb094850efa6d0c7deab3bcea45f32c0acf90dd",
+    "src/registry.py": "291762d7fff27d7eb0dc5e85f6e2081d10d93ed5ceaa22e8351e97a3c49ee126",
+    "tests/test_registry.py": "de79e62cdfe6b0f7c0fd12a6de2dc9e10aabbfbc2edad7706b0c5f87b7b33cab",
+    "reports/lesson7_registry.pl.md": "27243fbecd81b9bed0ed5867effbc26893ff63df0864fb320d0a6ff8565bc10f",
+    "reports/evidence/lesson7-registry.json": "153116b40ed9689901896ee8b520b286aa29177916ae66efa70a2bde037f8862",
+    "reports/evidence/lesson7-checks.json": "34db66dd8f8548234bbfc5e7569fe214fdb08f10633db56010ca7e3780b00c52",
+    "reports/evidence/lesson7-integrity.json": "572582a6437aaf3dbbfc2543cf99188ddedeec6eb4107df8ecbd6667f4f77ea3"
+  },
+  "private_documents_absent_in_checkout": true,
+  "fresh_pytest_summary": "112 passed, 3 warnings in 201.46s (0:03:21)",
+  "public_uci_download_verified": true,
+  "source_batch": "artifacts/lesson5/20261111T151331859292Z-8a303ead",
+  "validation_metrics_match_reference": true,
+  "current_evidence_handoff": "artifacts/lesson7/rebuilt/evidence.json",
+  "isolated_demo": {
+    "status": "PASS",
+    "real_uci_models": true,
+    "successful_versions": "two releases of the same validation winner",
+    "rejected_candidate": "logistic_balanced",
+    "regression_blocked": true,
+    "promotion_and_rollback": true,
+    "notebook_without_champion": "PASS",
+    "notebook_with_champion": "PASS",
+    "main_registry_unchanged": true,
+    "deployed": false
+  }
+}

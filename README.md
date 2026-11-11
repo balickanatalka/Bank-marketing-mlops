@@ -14,13 +14,13 @@ Nie jest przeznaczony do podejmowania rzeczywistych decyzji finansowych.
 | Zaimplementowane | Planowane w kolejnych etapach |
 |---|---|
 | Python, uv, plik blokady zależności i konfiguracja YAML | Dalsza automatyzacja jakości i utrzymania |
-| Automatyczne pobieranie UCI, manifest i pełny kontrakt danych | Rejestr modeli i kontrolowana promocja |
+| Automatyczne pobieranie UCI, manifest i pełny kontrakt danych | Weryfikacja operacyjna w kolejnych etapach |
 | Walidacja danych i podział chronologiczny | API, Docker oraz CI/CD z kontrolami jakości i bezpieczeństwa |
 | Notebook EDA, DummyClassifier i LogisticRegression | Staging, shadow deployment i rollback |
 | Wspólny preprocessing, trening i ewaluacja przez CLI | Monitoring, dryf, SLI/SLO i kontrolowany retraining |
 | Testy pytest, Ruff i lokalne hooki pre-commit | Microsoft RAG z ewaluacją, cytowaniami i tracingiem |
 | Pipeline DVC: download, validate, prepare, train, evaluate; cache i parametry | Feature store tylko przy uzasadnionej potrzebie |
-| MLflow lokalnie: SQLite, 6 eksperymentów, parametry, metryki i artefakty | Dalsza integracja z rejestrem modeli |
+| MLflow lokalnie: SQLite, 6 eksperymentów, parametry, metryki i artefakty | Dalsze etapy udostępniania modeli |
 
 Microsoft RAG będzie rozszerzeniem korzystającym z dokumentacji i raportów MLOps.
 Nie zastępuje klasycznego modelu ani wymagań związanych z jego cyklem życia.
@@ -30,8 +30,8 @@ DagsHub i zdalny magazyn DVC nie są wymagane. Odtworzenie zapewnia oficjalne UC
 z weryfikacją SHA-256. Lokalne DVC sprawdzamy osobno; pipeline DVC jest etapem
 kolejnych zajęć. Procedura lokalnej weryfikacji i odtworzenia z UCI:
 [odtwarzalność](docs/REPRODUCIBILITY.md#zajęcia-3-integralność-i-lokalne-dvc).
-Lokalne wersjonowanie danych przez metadane DVC, cache i `dvc checkout` już działa.
-Nie zaimplementowano jeszcze `dvc.yaml`, `dvc.lock` ani pipeline'u `dvc repro`.
+Pipeline `dvc.yaml` i `dvc.lock` wdrożono na zajęciach 4. Bieżące rozbieżności
+DVC są opisane w raportach; ich usunięcie nie jest częścią zajęć 7.
 
 ## Problem biznesowy i dane
 
@@ -148,7 +148,26 @@ or model promotion. The aggregate [comparison](reports/experiment_comparison.md)
 [protocol](docs/EXPERIMENT_PROTOCOL.md), [model card](docs/MODEL_CARD.md) and executed
 `notebooks/02_model_experiments.ipynb` describe actual validation results.
 See [reproduction instructions](docs/REPRODUCIBILITY.md) for export and local MLflow UI.
-Final test and replay remain reserved. MLflow Registry, API and Microsoft RAG are future work.
+Final test and replay remain reserved. API and Microsoft RAG are future work.
+
+## Zajęcia 7: lokalny Model Registry
+
+Pakowanie istniejącego Pipeline, wersje MLflow, alias challenger, jawna kontrola
+promocji champion i rollback są dostępne lokalnie. Rejestracja nie promuje modelu.
+[Instrukcja i lineage](docs/MODEL_REGISTRY.pl.md),
+[raport wykonania](reports/lesson7_registry.pl.md) i
+`notebooks/03_model_registry.ipynb` opisują zakres.
+Modele i bazy pozostają poza Git; główny rejestr nie ma championa.
+Promocję i rollback sprawdzamy wyłącznie w izolowanych testach/demo.
+
+```powershell
+uv run --locked python -m scripts.verify_lesson7 --rebuild --execute-notebook
+```
+
+Komenda odtwarza jeden nowy batch, jawnie przekazuje go do nowego rejestru
+i wykonuje kopię notebooka z aktualnym dowodem. Wynik `EVIDENCE=...` pozwala
+otworzyć ten sam rejestr ręcznie; nie wymaga historycznych ID ani baz.
+[Procedura odtworzenia wersji roboczej](docs/MODEL_REGISTRY.pl.md#izolowana-próba-wersji-roboczej).
 
 ## Modele i rzeczywiste wyniki
 
@@ -348,3 +367,11 @@ wersji ani przeglądu przez drugą osobę. Aktualne dowody i pozostałe braki:
 Licencja zbioru danych jest opisana w [DATA_LICENSE.md](DATA_LICENSE.md).
 Informacje o zależnościach znajdują się w [THIRD_PARTY_NOTICES.md](docs/THIRD_PARTY_NOTICES.md).
 Własny kod projektu nie jest udostępniony na licencji open source. Dane UCI i komponenty zewnętrzne podlegają odrębnym licencjom opisanym w dokumentacji.
+
+## Zakres bieżącego etapu
+
+Projekt realizowany indywidualnie, docelowo na ocenę **5,0**. Po zajęciach 7
+nie są jeszcze wykonane elementy usług, CI, wdrożenia, monitoringu i CT.
+[Raport zajęć 7](reports/lesson7_registry.pl.md) opisuje publiczny zakres i dowody.
+Odtworzenie korzysta wyłącznie z plików repozytorium oraz publicznego źródła danych;
+nie wymaga lokalnej dokumentacji organizacyjnej.

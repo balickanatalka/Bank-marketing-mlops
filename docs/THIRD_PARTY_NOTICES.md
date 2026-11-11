@@ -25,9 +25,10 @@ Własny kod projektu nie jest udostępniony na licencji open source. Dane UCI i 
 Python 3.12.10: PSF License; uv 0.13.4: MIT OR Apache-2.0; Git: GPL-2.0.
 Są narzędziami zewnętrznymi, nie kopiami ich kodu w repozytorium.
 pip z pierwotnego venv nie jest zależnością zadeklarowaną ani pozycją locka.
-MLflow, Microsoft RAG, LLM, embeddingi, kontenery i monitoring pozostają
-kolejnymi etapami projektu; nie mają jeszcze zainstalowanych komponentów
-w deklarowanym zestawie zależności. Ich licencje wymagają osobnej oceny później.
+MLflow jest zainstalowane od zajęć 5; wersje i licencje opisano poniżej.
+Format skops jest jawną zależnością pakowania zajęć 7, przypiętą przez uv.lock.
+Microsoft RAG, LLM, embeddingi, kontenery i monitoring pozostają kolejnymi etapami;
+licencje ich przyszłych komponentów wymagają osobnej oceny.
 
 ## Istotne zależności i zakres obowiązków
 
@@ -301,3 +302,16 @@ No custom open source license is added to project code; UCI attribution is uncha
 | werkzeug | 3.1.9 | BSD-3-Clause |
 | xgboost-cpu | 3.4.1 | Apache-2.0 |
 | zipp | 4.1.2 | MIT |
+
+## Zajęcia 6–7: testy i jawny format pakietu
+
+| Dystrybucja | Wersja z locka | Deklaracja licencji | Źródło |
+| --- | --- | --- | --- |
+| hypothesis | 6.131.9 | MPL-2.0 | [Projekt i źródła](https://github.com/HypothesisWorks/hypothesis), [wydanie PyPI](https://pypi.org/project/hypothesis/6.131.9/) |
+| sortedcontainers | 2.4.0 | Apache-2.0 | [Projekt](https://grantjenks.com/docs/sortedcontainers/), [wydanie PyPI](https://pypi.org/project/sortedcontainers/2.4.0/) |
+
+Deklaracje sprawdzono w lokalnych METADATA przypiętych dystrybucji.
+Hypothesis służy testom własności, sortedcontainers jest jego zależnością.
+Skops 0.16.0 (MIT, ujęty wyżej) służy zapisowi kompletnego Pipeline z jawną
+listą zaufanych typów. Dodanie go do zależności bezpośrednich nie zmieniło
+wersji pakietów w lockfile; nie jest nową technologią przyszłych zajęć.

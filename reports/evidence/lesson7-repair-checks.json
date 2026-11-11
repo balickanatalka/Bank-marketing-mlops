@@ -1,0 +1,220 @@
+{
+  "ruff_check": {
+    "status": "PASS",
+    "exit_code": 0,
+    "command": [
+      "uv",
+      "run",
+      "--locked",
+      "--no-sync",
+      "ruff",
+      "check",
+      "."
+    ],
+    "log": "artifacts/lesson7/public-20261111T150401795662Z/ruff_check.log",
+    "log_sha256": "a4443afdcfb6d7363adb285762515ccf7cf50473b1a05c20c1a50f6bed4d26b0"
+  },
+  "ruff_format": {
+    "status": "PASS",
+    "exit_code": 0,
+    "command": [
+      "uv",
+      "run",
+      "--locked",
+      "--no-sync",
+      "ruff",
+      "format",
+      "--check",
+      "."
+    ],
+    "log": "artifacts/lesson7/public-20261111T150401795662Z/ruff_format.log",
+    "log_sha256": "0ebfbaa6ecd9eab5453c889fae528fb1672e5f8c90d46a9964e8e3fdf028c8a2"
+  },
+  "pre_commit": {
+    "status": "PASS",
+    "exit_code": 0,
+    "command": [
+      "uv",
+      "run",
+      "--locked",
+      "--no-sync",
+      "pre-commit",
+      "run",
+      "--files",
+      "src/registry.py",
+      "src/model_card.py",
+      "scripts/verify_lesson7.py",
+      "scripts/lineage.py",
+      "scripts/demo_lesson7.py",
+      "scripts/reproduce_lesson7.py",
+      "tests/test_registry.py",
+      "notebooks/03_model_registry.ipynb"
+    ],
+    "log": "artifacts/lesson7/public-20261111T150401795662Z/pre_commit.log",
+    "log_sha256": "fb67f9e8e74279812e310f6652d0813ead55ac8e80735eccc5c9a475611420f7"
+  },
+  "uv_lock": {
+    "status": "PASS",
+    "exit_code": 0,
+    "command": [
+      "uv",
+      "lock",
+      "--check",
+      "--offline"
+    ],
+    "log": "artifacts/lesson7/public-20261111T150401795662Z/uv_lock.log",
+    "log_sha256": "482c721685dab4052a42baaf492c0a1e9ef09f1b6ecbffec310c5760d83da4e2"
+  },
+  "dependencies": {
+    "status": "PASS",
+    "exit_code": 0,
+    "command": [
+      "uv",
+      "pip",
+      "check"
+    ],
+    "log": "artifacts/lesson7/public-20261111T150401795662Z/dependencies.log",
+    "log_sha256": "02dbc2c792b665a3548c720c50c86849b70155385f788725cd572c1ca2af456f"
+  },
+  "dvc_dag": {
+    "status": "PASS",
+    "exit_code": 0,
+    "command": [
+      "uv",
+      "run",
+      "--locked",
+      "--no-sync",
+      "dvc",
+      "dag",
+      "--dot"
+    ],
+    "log": "artifacts/lesson7/public-20261111T150401795662Z/dvc_dag.log",
+    "log_sha256": "628109c20ff31a49d7fa77ec67db57dc52e40895934603da34c4ebe4752e0746"
+  },
+  "dvc_status": {
+    "status": "WARN",
+    "exit_code": 0,
+    "command": [
+      "uv",
+      "run",
+      "--locked",
+      "--no-sync",
+      "dvc",
+      "status",
+      "--json"
+    ],
+    "log": "artifacts/lesson7/public-20261111T150401795662Z/dvc_status.log",
+    "log_sha256": "2985ed8994ae543933890c45914d0203ce9c9a92f7044784baee51abd17531d0",
+    "details": {
+      "validate": [
+        {
+          "changed outs": {
+            "artifacts\\lesson4\\validated.json": "not in cache"
+          }
+        }
+      ],
+      "prepare": [
+        {
+          "changed deps": {
+            "src\\pipeline.py": "modified",
+            "artifacts\\lesson4\\validated.json": "deleted"
+          }
+        },
+        {
+          "changed outs": {
+            "data\\lesson4\\processed": "not in cache",
+            "artifacts\\lesson4\\reports\\data_validation.json": "not in cache",
+            "artifacts\\lesson4\\reports\\class_distribution.png": "not in cache"
+          }
+        }
+      ],
+      "train": [
+        {
+          "changed deps": {
+            "src\\pipeline.py": "modified",
+            "pyproject.toml": "modified",
+            "uv.lock": "modified",
+            "data\\lesson4\\processed\\train.csv": "deleted",
+            "data\\lesson4\\processed\\metadata.json": "deleted"
+          }
+        },
+        {
+          "changed outs": {
+            "artifacts\\lesson4\\models": "not in cache"
+          }
+        }
+      ],
+      "evaluate": [
+        {
+          "changed deps": {
+            "src\\pipeline.py": "modified",
+            "pyproject.toml": "modified",
+            "uv.lock": "modified",
+            "data\\lesson4\\processed\\validation.csv": "deleted",
+            "data\\lesson4\\processed\\metadata.json": "deleted",
+            "artifacts\\lesson4\\models": "deleted"
+          }
+        },
+        {
+          "changed outs": {
+            "artifacts\\lesson4\\reports\\confusion_matrix_dummy.png": "not in cache",
+            "artifacts\\lesson4\\reports\\confusion_matrix_model.png": "not in cache",
+            "artifacts\\lesson4\\reports\\metrics.json": "not in cache"
+          }
+        }
+      ]
+    }
+  },
+  "pytest_full": {
+    "status": "PASS",
+    "command": [
+      "python",
+      "-m",
+      "pytest",
+      "-q",
+      "--basetemp",
+      "artifacts\\lesson7\\public-20261111T150401795662Z\\pytest-full"
+    ],
+    "exit_code": 0,
+    "seconds": 218.02,
+    "log": "artifacts/lesson7/public-20261111T150401795662Z/pytest_full.log",
+    "log_sha256": "1f240ac27512b3fb2c9291a2b8446fa936468b35668ca3495850072c8f2ce4b3",
+    "summary": "112 passed, 3 warnings in 208.04s (0:03:28)"
+  },
+  "registry_tests": {
+    "status": "PASS",
+    "command": [
+      "python",
+      "-m",
+      "pytest",
+      "tests/test_registry.py",
+      "-q",
+      "--basetemp",
+      "artifacts\\lesson7\\public-20261111T150401795662Z\\pytest-registry"
+    ],
+    "exit_code": 0,
+    "seconds": 174.97,
+    "log": "artifacts/lesson7/public-20261111T150401795662Z/registry_tests.log",
+    "log_sha256": "6ea1379f5c549e66f89794982545042991f547c3dff6f71320144a19ad193325",
+    "summary": "38 passed, 3 warnings in 164.27s (0:02:44)"
+  },
+  "fresh_reproduction": {
+    "status": "PASS",
+    "summary": "112 passed, 3 warnings in 201.46s (0:03:21)",
+    "evidence": "reports/evidence/lesson7-repair-reproduction.json",
+    "private_documents_required": false,
+    "private_documents_absent": true
+  },
+  "uci_quality_enabled": true,
+  "notebook_states": [
+    "no_champion",
+    "champion",
+    "other_challenger"
+  ],
+  "limitations": [
+    "Local clone with explicit source overlay on the same machine",
+    "Fresh installation uses no existing uv cache; Python interpreter is reused",
+    "Python read audit hooks are not an operating-system sandbox",
+    "Existing DVC and SQLAlchemy warnings remain visible"
+  ]
+}
