@@ -65,6 +65,8 @@ Thumbs.db
 # Prywatna dokumentacja lokalna
 private_notes/
 docs/PROJECT_PLAN.md
+docs/AI_USAGE.pl.md
+docs/MOODLE_COMPLIANCE.pl.md
 
 # Local MLflow metadata and SQLite sidecars
 .mlflow/

@@ -1,0 +1,388 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Bank Marketing demonstration API",
+    "version": "v1"
+  },
+  "paths": {
+    "/health/live": {
+      "get": {
+        "summary": "Live",
+        "operationId": "live_health_live_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/health/ready": {
+      "get": {
+        "summary": "Ready",
+        "operationId": "ready_health_ready_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/predict": {
+      "post": {
+        "summary": "Predict",
+        "operationId": "predict_v1_predict_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PredictRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PredictResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "BankRecord": {
+        "properties": {
+          "age_years": {
+            "type": "integer",
+            "maximum": 120.0,
+            "minimum": 1.0,
+            "title": "Age Years"
+          },
+          "job": {
+            "type": "string",
+            "enum": [
+              "admin.",
+              "blue-collar",
+              "entrepreneur",
+              "housemaid",
+              "management",
+              "retired",
+              "self-employed",
+              "services",
+              "student",
+              "technician",
+              "unemployed",
+              "unknown"
+            ],
+            "title": "Job"
+          },
+          "marital_status": {
+            "type": "string",
+            "enum": [
+              "divorced",
+              "married",
+              "single",
+              "unknown"
+            ],
+            "title": "Marital Status"
+          },
+          "education": {
+            "type": "string",
+            "enum": [
+              "basic.4y",
+              "basic.6y",
+              "basic.9y",
+              "high.school",
+              "illiterate",
+              "professional.course",
+              "university.degree",
+              "unknown"
+            ],
+            "title": "Education"
+          },
+          "credit_default": {
+            "type": "string",
+            "enum": [
+              "no",
+              "unknown",
+              "yes"
+            ],
+            "title": "Credit Default"
+          },
+          "housing_loan": {
+            "type": "string",
+            "enum": [
+              "no",
+              "unknown",
+              "yes"
+            ],
+            "title": "Housing Loan"
+          },
+          "personal_loan": {
+            "type": "string",
+            "enum": [
+              "no",
+              "unknown",
+              "yes"
+            ],
+            "title": "Personal Loan"
+          },
+          "days_since_previous_contact": {
+            "type": "integer",
+            "maximum": 999.0,
+            "minimum": 0.0,
+            "title": "Days Since Previous Contact"
+          },
+          "previous_contacts": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Previous Contacts"
+          },
+          "previous_campaign_outcome": {
+            "type": "string",
+            "enum": [
+              "failure",
+              "nonexistent",
+              "success"
+            ],
+            "title": "Previous Campaign Outcome"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "age_years",
+          "job",
+          "marital_status",
+          "education",
+          "credit_default",
+          "housing_loan",
+          "personal_loan",
+          "days_since_previous_contact",
+          "previous_contacts",
+          "previous_campaign_outcome"
+        ],
+        "title": "BankRecord",
+        "description": "One pre-contact record; bounds and dictionaries come from the UCI schema."
+      },
+      "ErrorResponse": {
+        "properties": {
+          "contract_version": {
+            "type": "string",
+            "const": "v1",
+            "title": "Contract Version"
+          },
+          "request_id": {
+            "type": "string",
+            "title": "Request Id"
+          },
+          "error": {
+            "type": "string",
+            "enum": [
+              "invalid_request",
+              "model_unavailable",
+              "prediction_failed"
+            ],
+            "title": "Error"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "contract_version",
+          "request_id",
+          "error"
+        ],
+        "title": "ErrorResponse",
+        "description": "Stable errors never echo request values, paths or exception messages."
+      },
+      "HealthResponse": {
+        "properties": {
+          "contract_version": {
+            "type": "string",
+            "const": "v1",
+            "title": "Contract Version"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "alive",
+              "ready"
+            ],
+            "title": "Status"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "contract_version",
+          "status"
+        ],
+        "title": "HealthResponse",
+        "description": "Process liveness is independent of successful model initialization."
+      },
+      "PredictRequest": {
+        "properties": {
+          "records": {
+            "items": {
+              "$ref": "#/components/schemas/BankRecord"
+            },
+            "type": "array",
+            "maxItems": 100,
+            "minItems": 1,
+            "title": "Records"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "records"
+        ],
+        "title": "PredictRequest",
+        "description": "A bounded batch; no inference-time feature engineering is added here."
+      },
+      "PredictResponse": {
+        "properties": {
+          "contract_version": {
+            "type": "string",
+            "const": "v1",
+            "title": "Contract Version"
+          },
+          "request_id": {
+            "type": "string",
+            "title": "Request Id"
+          },
+          "model_name": {
+            "type": "string",
+            "title": "Model Name"
+          },
+          "model_version": {
+            "type": "string",
+            "title": "Model Version"
+          },
+          "mode": {
+            "type": "string",
+            "const": "demonstration",
+            "title": "Mode"
+          },
+          "decision_threshold": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Decision Threshold"
+          },
+          "predictions": {
+            "items": {
+              "$ref": "#/components/schemas/Prediction"
+            },
+            "type": "array",
+            "maxItems": 100,
+            "minItems": 1,
+            "title": "Predictions"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "contract_version",
+          "request_id",
+          "model_name",
+          "model_version",
+          "mode",
+          "decision_threshold",
+          "predictions"
+        ],
+        "title": "PredictResponse",
+        "description": "Pinned model identity stays stable for the lifetime of one service process."
+      },
+      "Prediction": {
+        "properties": {
+          "probability_yes": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Probability Yes"
+          },
+          "class_label": {
+            "type": "string",
+            "enum": [
+              "no",
+              "yes"
+            ],
+            "title": "Class Label"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "probability_yes",
+          "class_label"
+        ],
+        "title": "Prediction",
+        "description": "Decision at the model's recorded threshold and probability of y=yes."
+      }
+    }
+  }
+}

@@ -12,6 +12,9 @@ dependencies = [
     "mlflow>=3,<4",
     "skops>=0.16,<0.17",
     "xgboost-cpu>=3,<4",
+    "fastapi==0.162.0",
+    "pydantic==2.14.1",
+    "uvicorn==0.54.0",
 ]
 
 [dependency-groups]
@@ -24,6 +27,7 @@ dev = [
     "nbformat>=5,<6",
     "dvc>=3,<4",
     "hypothesis==6.131.9",
+    "httpx>=0.28,<1",
 ]
 
 [tool.uv]

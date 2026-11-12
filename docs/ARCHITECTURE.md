@@ -1,7 +1,8 @@
 # Architektura eksperymentu
 
 Eksperyment jest lokalnym programem Python z osobnym lokalnym rejestrem MLflow.
-Nie uruchamia API, usług monitoringu ani LLM. Notebook i CLI korzystają z tej samej implementacji.
+Lokalne API z zajęć 8 odczytuje zweryfikowany model z rejestru.
+Nie uruchamiamy usług monitoringu ani LLM. Notebook i CLI korzystają z tej samej implementacji.
 
 ```text
 UCI ZIP -> CSV -> SHA-256 -> walidacja -> podział chronologiczny
@@ -22,7 +23,7 @@ niezgodność wejść; hash modelu jest sprawdzany przed deserializacją. Mechan
 nie zastępuje uwierzytelnienia artefaktów i wymaga zaufanego lokalnego treningu.
 Final test i replay są rozdzielone od części używanych do treningu i walidacji.
 
-Kierunki rozwoju obejmują API, kontenery, CI/CD, monitoring i retraining.
+Kierunki rozwoju obejmują kontenery, CI/CD, monitoring i retraining.
 Microsoft RAG ma korzystać z dokumentacji i raportów, nie obliczać predykcji ani
 samodzielnie promować modeli. Wymienione przyszłe usługi nie są obecnie zaimplementowane.
 
@@ -69,3 +70,31 @@ Manifest wiąże artefakty, schemat i lineage; wersja rejestru wskazuje run pako
 oraz oryginalny run treningowy. Nie powstaje nowy model ani nowy preprocessing.
 `src/model_card.py` generuje kartę z tych samych metadanych. Procedury i ograniczenia
 lokalnej blokady aliasów opisuje [instrukcja rejestru](MODEL_REGISTRY.pl.md).
+
+## Udostępnianie modelu — zajęcia 8
+
+`src/serving_contract.py` definiuje ścisły kontrakt v1 i jawne mapowanie nazw
+publicznych na dziesięć dotychczasowych cech. Zakresy i kategorie pochodzą
+z `src/data/schema.py`. Snapshot OpenAPI i testy kontrolują zgodność kontraktu.
+
+`src/serving.py` w lifespan FastAPI otwiera wskazany dowód LocalRegistry,
+sprawdza integralność, lineage, schemat, jakość validation i klasy modelu.
+Raz ładuje kompletny zapisany Pipeline. Alias challenger rozwiązuje raz;
+od tego momentu proces używa konkretnej wersji bez dalszych odczytów rejestru.
+Nie wywołuje register, challenger, promote ani rollback.
+
+```text
+HTTP JSON -> Pydantic v1 -> mapowanie kolumn -> zapisany Pipeline.predict_proba
+  -> kontrola wyniku -> próg 0.5 -> odpowiedź z wersją i request_id
+```
+
+Health/live rozdzielono od health/ready. Brak modelu nie zatrzymuje procesu,
+lecz blokuje predykcję kodem 503. Błędy wejścia dają 422, inferencji 500 bez
+szczegółów wewnętrznych. Logi JSON zawierają tylko metadane żądania.
+Wszystkie odpowiedzi predykcji oznaczają `mode=demonstration`.
+
+`scripts/prepare_lesson8.py` wykorzystuje istniejący rebuild zajęć 7 w nowym
+lokalnym klonie, nowej .venv i rejestrze. Stare modele ani bazy nie są kopiowane.
+`scripts/demo_lesson8.py` uruchamia osobny proces HTTP na localhost, sprawdza
+kontrakt, mierzy percentyle i zawsze zatrzymuje serwer. Notebook 04 używa tej
+samej demonstracji; nie trenuje. Procedura: [MODEL_SERVING.pl.md](MODEL_SERVING.pl.md).

@@ -15,12 +15,13 @@ Nie jest przeznaczony do podejmowania rzeczywistych decyzji finansowych.
 |---|---|
 | Python, uv, plik blokady zależności i konfiguracja YAML | Dalsza automatyzacja jakości i utrzymania |
 | Automatyczne pobieranie UCI, manifest i pełny kontrakt danych | Weryfikacja operacyjna w kolejnych etapach |
-| Walidacja danych i podział chronologiczny | API, Docker oraz CI/CD z kontrolami jakości i bezpieczeństwa |
+| Walidacja danych i podział chronologiczny | Docker oraz CI/CD z kontrolami jakości i bezpieczeństwa |
 | Notebook EDA, DummyClassifier i LogisticRegression | Staging, shadow deployment i rollback |
 | Wspólny preprocessing, trening i ewaluacja przez CLI | Monitoring, dryf, SLI/SLO i kontrolowany retraining |
 | Testy pytest, Ruff i lokalne hooki pre-commit | Microsoft RAG z ewaluacją, cytowaniami i tracingiem |
 | Pipeline DVC: download, validate, prepare, train, evaluate; cache i parametry | Feature store tylko przy uzasadnionej potrzebie |
 | MLflow lokalnie: SQLite, 6 eksperymentów, parametry, metryki i artefakty | Dalsze etapy udostępniania modeli |
+| FastAPI: kontrakt v1, model z registry, health/ready, testy i lokalne demo HTTP | Produkcyjne zatwierdzenie modelu i usługi |
 
 Microsoft RAG będzie rozszerzeniem korzystającym z dokumentacji i raportów MLOps.
 Nie zastępuje klasycznego modelu ani wymagań związanych z jego cyklem życia.
@@ -375,3 +376,22 @@ nie są jeszcze wykonane elementy usług, CI, wdrożenia, monitoringu i CT.
 [Raport zajęć 7](reports/lesson7_registry.pl.md) opisuje publiczny zakres i dowody.
 Odtworzenie korzysta wyłącznie z plików repozytorium oraz publicznego źródła danych;
 nie wymaga lokalnej dokumentacji organizacyjnej.
+
+## Zajęcia 8 — lokalne API demonstracyjne
+
+Kontrakt: `POST /v1/predict`, `GET /health/live`, `GET /health/ready`; OpenAPI w `/docs`.
+Model z zajęć 7 wraz z preprocessingiem jest ładowany raz, bez zmiany registry.
+Challenger pozostaje modelem demonstracyjnym; recall wynosi 7/794 przy progu 0,5.
+
+```powershell
+uv sync --locked
+uv run --locked python -m scripts.prepare_lesson8
+```
+
+Przygotowanie tworzy nowy izolowany klon, środowisko i rejestr z publicznego UCI,
+potem wykonuje demo HTTP i testy API. Nie wymaga modeli ani prywatnych dokumentów
+z poprzedniego komputera. Instrukcja startu i wyboru wersji:
+[udostępnianie modelu](docs/MODEL_SERVING.pl.md).
+Kontrakt i JSON: [API v1](docs/API_CONTRACT.md).
+Notebook: [04_model_serving.ipynb](notebooks/04_model_serving.ipynb).
+Wyniki i ograniczenia: [raport zajęć 8](reports/lesson8_serving.pl.md).

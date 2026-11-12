@@ -315,3 +315,13 @@ Hypothesis służy testom własności, sortedcontainers jest jego zależnością
 Skops 0.16.0 (MIT, ujęty wyżej) służy zapisowi kompletnego Pipeline z jawną
 listą zaufanych typów. Dodanie go do zależności bezpośrednich nie zmieniło
 wersji pakietów w lockfile; nie jest nową technologią przyszłych zajęć.
+
+## Zajęcia 8 — usługa lokalna
+
+FastAPI i Pydantic: MIT. Uvicorn, httpx i httpcore: BSD-3-Clause.
+Dokładne wersje i zależności przechodnie zapisuje uv.lock.
+Dokumentacja techniczna: [FastAPI lifespan](https://fastapi.tiangolo.com/advanced/events/),
+[obsługa błędów](https://fastapi.tiangolo.com/tutorial/handling-errors/),
+[Pydantic strict mode](https://docs.pydantic.dev/latest/concepts/strict_mode/).
+Materiały prowadzącego wykorzystano jako wymagania i punkt odniesienia;
+nie kopiowano ich pełnej treści ani rozwiązań Iris do repozytorium.
