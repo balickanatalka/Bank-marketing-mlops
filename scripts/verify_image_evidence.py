@@ -9,6 +9,7 @@ from pathlib import Path
 
 SPDX = "https://spdx.dev/Document"
 SLSA = "https://slsa.dev/provenance/v1"
+SYFT_VERSION = "1.57.2"
 
 
 def verify_image(archive: Path, expected_digest: str) -> dict:
@@ -98,13 +99,81 @@ def verify_image(archive: Path, expected_digest: str) -> dict:
     }
 
 
+def verify_cyclonedx(archive: Path, expected_digest: str, report: Path) -> dict:
+    """Bind a Syft 1.57.2 CycloneDX report to freshly verified OCI bytes.
+
+    Check the report structure, producer and platform subject. This is an
+    integrity check, not cryptographic signing or full JSON Schema validation.
+    """
+    image = verify_image(archive, expected_digest)
+    if report.stat().st_size > 64 * 1024 * 1024:
+        raise ValueError("CycloneDX report exceeds size limit")
+    raw = report.read_bytes()
+    document = json.loads(raw)
+    if (
+        not isinstance(document, dict)
+        or document.get("bomFormat") != "CycloneDX"
+        or document.get("specVersion") != "1.7"
+        or type(document.get("version")) is not int
+        or document["version"] < 1
+    ):
+        raise ValueError("Invalid CycloneDX format or version")
+    metadata = document.get("metadata")
+    if not isinstance(metadata, dict):
+        raise ValueError("Missing CycloneDX metadata")
+    subject = metadata.get("component", {})
+    if (
+        not isinstance(subject, dict)
+        or subject.get("type") != "container"
+        or subject.get("version") != image["platform_manifest_digest"]
+    ):
+        raise ValueError("CycloneDX subject differs from verified platform manifest")
+    tools = metadata.get("tools", {})
+    producers = tools.get("components", []) if isinstance(tools, dict) else []
+    if not isinstance(producers, list) or not any(
+        isinstance(tool, dict)
+        and tool.get("name") == "syft"
+        and tool.get("version") == SYFT_VERSION
+        for tool in producers
+    ):
+        raise ValueError("Unexpected CycloneDX producer")
+    components = document.get("components")
+    if (
+        not isinstance(components, list)
+        or not components
+        or not all(
+            isinstance(component, dict)
+            and isinstance(component.get("name"), str)
+            and component["name"].strip()
+            and isinstance(component.get("type"), str)
+            and component["type"].strip()
+            for component in components
+        )
+    ):
+        raise ValueError("Missing or invalid CycloneDX components")
+    return {
+        **image,
+        "cyclonedx_spec_version": document["specVersion"],
+        "cyclonedx_components": len(components),
+        "cyclonedx_sha256": hashlib.sha256(raw).hexdigest(),
+        "cyclonedx_subject_digest": subject["version"],
+        "syft_version": SYFT_VERSION,
+    }
+
+
 def main() -> None:
     """Verify an OCI export and print a compact report only after all checks pass."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--archive", type=Path, required=True)
     parser.add_argument("--digest", required=True)
+    parser.add_argument("--cyclonedx", type=Path)
     args = parser.parse_args()
-    print(json.dumps(verify_image(args.archive, args.digest), indent=2))
+    result = (
+        verify_cyclonedx(args.archive, args.digest, args.cyclonedx)
+        if args.cyclonedx is not None
+        else verify_image(args.archive, args.digest)
+    )
+    print(json.dumps(result, indent=2))
 
 
 if __name__ == "__main__":

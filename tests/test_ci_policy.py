@@ -154,3 +154,61 @@ def test_unsafe_configuration_changes_are_rejected(mutation):
         step["run"] = step["run"].replace("--no-dev", "--all-groups")
     with pytest.raises(ValueError):
         validate_policy(workflow, action)
+
+
+@pytest.mark.parametrize(
+    "mutation",
+    [
+        "implicit_local_tag",
+        "registry",
+        "wrong_archive",
+        "file_autodetection",
+        "wrong_export",
+        "wrong_report",
+        "missing_binding",
+        "skipped_binding",
+        "wrong_binding_digest",
+        "wrong_binding_archive",
+        "binding_before_scan",
+        "unverified_archive",
+        "syft_version",
+        "registry_credentials",
+    ],
+)
+def test_sbom_must_use_verified_oci_bytes_and_block_on_bad_reports(mutation):
+    workflow, action = copy.deepcopy(documents())
+    steps = action["runs"]["steps"]
+    syft = next(s for s in steps if s.get("id") == "syft")
+    verifier = next(s for s in steps if s.get("id") == "verify_image")
+    binding = next(s for s in steps if "--cyclonedx" in s.get("run", ""))
+    if mutation == "implicit_local_tag":
+        syft["with"]["image"] = "bank-marketing-api:ci"
+    elif mutation == "registry":
+        syft["with"]["image"] = "registry:bank-marketing-api:ci"
+    elif mutation == "wrong_archive":
+        syft["with"]["image"] = "oci-archive:/other/image.tar"
+    elif mutation == "file_autodetection":
+        syft["with"]["file"] = syft["with"].pop("image")
+    elif mutation == "wrong_export":
+        verifier["run"] = verifier["run"].replace("image.oci.tar", "other.oci.tar")
+    elif mutation == "wrong_report":
+        syft["with"]["output-file"] = "other.cdx.json"
+    elif mutation == "missing_binding":
+        steps.remove(binding)
+    elif mutation == "skipped_binding":
+        binding["if"] = "false"
+    elif mutation == "wrong_binding_digest":
+        binding["env"]["EXPECTED_IMAGE_DIGEST"] = "untrusted"
+    elif mutation == "wrong_binding_archive":
+        binding["run"] = binding["run"].replace("image.oci.tar", "other.oci.tar")
+    elif mutation == "binding_before_scan":
+        steps.remove(binding)
+        steps.insert(steps.index(syft), binding)
+    elif mutation == "unverified_archive":
+        syft["if"] = syft["if"].replace(" && steps.verify_image.outcome == 'success'", "")
+    elif mutation == "syft_version":
+        syft["with"]["syft-version"] = "latest"
+    elif mutation == "registry_credentials":
+        syft["with"]["registry-username"] = "unexpected"
+    with pytest.raises(ValueError):
+        validate_policy(workflow, action)

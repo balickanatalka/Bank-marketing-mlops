@@ -6,6 +6,8 @@ from pathlib import Path
 
 import yaml
 
+from scripts.verify_image_evidence import SYFT_VERSION
+
 ROOT = Path(__file__).resolve().parents[1]
 REQUIRED_JOBS = (
     "functional_checks",
@@ -24,6 +26,15 @@ PUBLISH_CONDITION = (
 SCAN_CONDITION = (
     "${{ always() && inputs.scan-security == 'true' && steps.build.outcome == 'success' }}"
 )
+VERIFIED_SCAN_CONDITION = (
+    "${{ always() && inputs.scan-security == 'true' && steps.build.outcome == 'success' "
+    "&& steps.verify_image.outcome == 'success' }}"
+)
+CYCLONEDX_CONDITION = (
+    "${{ always() && inputs.scan-security == 'true' && steps.build.outcome == 'success' "
+    "&& steps.verify_image.outcome == 'success' && steps.syft.outcome == 'success' }}"
+)
+OCI_SOURCE = "oci-archive:${{ env.BANK_CI_EVIDENCE_DIR }}/image.oci.tar"
 IMAGE_ACTION = "./.github/actions/check-image"
 
 
@@ -173,10 +184,21 @@ def validate_policy(workflow: dict, action: dict) -> None:
     verifier = next(s for s in steps if "scripts.verify_image_evidence" in s.get("run", ""))
     http = next(s for s in steps if "pytest tests/test_serving.py" in s.get("run", ""))
     require("if" not in verifier and "if" not in http, "Candidate verification may not be skipped")
+    require(verifier.get("id") == "verify_image", "Archive verification must be addressable")
     require(
         verifier["env"]["EXPECTED_IMAGE_DIGEST"] == "${{ steps.build.outputs.digest }}"
         and "docker image save bank-marketing-api:ci" in verifier["run"],
         "Attestation verification must use the built image",
+    )
+    archive = '"$BANK_CI_EVIDENCE_DIR/image.oci.tar"'
+    verify_command = (
+        "uv run --locked python -m scripts.verify_image_evidence "
+        f'--archive {archive} --digest "$EXPECTED_IMAGE_DIGEST"'
+    )
+    require(
+        f"docker image save bank-marketing-api:ci --output {archive}" in verifier["run"]
+        and verify_command in verifier["run"],
+        "The scanner must receive the same verified OCI archive",
     )
     require(
         http["env"]["BANK_MARKETING_TEST_IMAGE"] == "bank-marketing-api:ci",
@@ -193,11 +215,50 @@ def validate_policy(workflow: dict, action: dict) -> None:
     }.items():
         require(trivy["with"].get(key) == expected, "Image vulnerability policy weakened")
     syft = next(s for s in steps if s.get("uses", "").startswith("anchore/sbom-action@"))
-    require(normalize(syft["if"]) == SCAN_CONDITION, "SBOM generation may not be skipped")
+    require(
+        normalize(syft["if"]) == VERIFIED_SCAN_CONDITION,
+        "SBOM generation requires verified archive bytes",
+    )
     require(
         syft["with"]["upload-release-assets"] == "false", "Candidate SBOM must not create a release"
     )
-    require(syft["with"]["image"] == "bank-marketing-api:ci", "Wrong SBOM candidate")
+    require(syft.get("id") == "syft", "SBOM generation must be addressable")
+    require(syft["with"].get("image") == OCI_SOURCE, "Wrong SBOM candidate archive/provider")
+    require(
+        not {"file", "path", "registry-username", "registry-password"}.intersection(syft["with"]),
+        "SBOM must not use implicit source resolution or registry credentials",
+    )
+    require(
+        syft["with"].get("format") == "cyclonedx-json"
+        and syft["with"].get("syft-version") == "v" + SYFT_VERSION
+        and syft["with"].get("output-file")
+        == "artifacts/ci/${{ inputs.artifact-name }}/sbom.cdx.json",
+        "Unexpected CycloneDX output contract",
+    )
+    bindings = [s for s in steps if "--cyclonedx" in s.get("run", "")]
+    require(len(bindings) == 1, "Missing CycloneDX identity gate")
+    binding = bindings[0]
+    require(normalize(binding.get("if", "")) == CYCLONEDX_CONDITION, "Unsafe CycloneDX condition")
+    require(
+        binding.get("env", {}).get("EXPECTED_IMAGE_DIGEST") == "${{ steps.build.outputs.digest }}",
+        "CycloneDX must use the trusted build digest",
+    )
+    require(
+        normalize(binding["run"])
+        == verify_command
+        + ' --cyclonedx "$BANK_CI_EVIDENCE_DIR/sbom.cdx.json"'
+        + ' > "$BANK_CI_EVIDENCE_DIR/cyclonedx-verification.json"',
+        "CycloneDX must verify the same archive and report without masking errors",
+    )
+    require(
+        steps.index(build)
+        < steps.index(verifier)
+        < steps.index(http)
+        < steps.index(syft)
+        < steps.index(binding)
+        < steps.index(trivy),
+        "Candidate checks must retain verification and binding order",
+    )
     uploads = [s for s in steps if s.get("uses", "").startswith("actions/upload-artifact@")]
     require(len(uploads) == 1, "Expected one reports-only upload")
     require(

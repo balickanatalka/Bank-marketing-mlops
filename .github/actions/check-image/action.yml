@@ -49,6 +49,7 @@ runs:
         cache-from: type=gha,scope=bank-marketing-api
         cache-to: type=gha,mode=max,scope=bank-marketing-api
     - name: Verify image bytes and attestation subjects
+      id: verify_image
       shell: bash
       env:
         EXPECTED_IMAGE_DIGEST: ${{ steps.build.outputs.digest }}
@@ -62,15 +63,23 @@ runs:
         BANK_MARKETING_TEST_IMAGE: bank-marketing-api:ci
       run: uv run --locked pytest tests/test_serving.py -q -k container_http --basetemp "$BANK_CI_EVIDENCE_DIR/tests" --junitxml "$BANK_CI_EVIDENCE_DIR/container-tests.xml"
     - name: Generate independent candidate SBOM
-      if: ${{ always() && inputs.scan-security == 'true' && steps.build.outcome == 'success' }}
+      id: syft
+      if: ${{ always() && inputs.scan-security == 'true' && steps.build.outcome == 'success' && steps.verify_image.outcome == 'success' }}
       uses: anchore/sbom-action@66cbf4bc1f1c0d2edc94016e65bc221b6bb0ad6c # v0.24.3
       with:
-        image: bank-marketing-api:ci
+        image: oci-archive:${{ env.BANK_CI_EVIDENCE_DIR }}/image.oci.tar
         syft-version: v1.57.2
         format: cyclonedx-json
         output-file: artifacts/ci/${{ inputs.artifact-name }}/sbom.cdx.json
         upload-artifact: false
         upload-release-assets: false
+    - name: Verify CycloneDX against the same OCI candidate
+      if: ${{ always() && inputs.scan-security == 'true' && steps.build.outcome == 'success' && steps.verify_image.outcome == 'success' && steps.syft.outcome == 'success' }}
+      shell: bash
+      env:
+        EXPECTED_IMAGE_DIGEST: ${{ steps.build.outputs.digest }}
+      run: |
+        uv run --locked python -m scripts.verify_image_evidence --archive "$BANK_CI_EVIDENCE_DIR/image.oci.tar" --digest "$EXPECTED_IMAGE_DIGEST" --cyclonedx "$BANK_CI_EVIDENCE_DIR/sbom.cdx.json" > "$BANK_CI_EVIDENCE_DIR/cyclonedx-verification.json"
     - name: Blocking image vulnerability scan
       if: ${{ always() && inputs.scan-security == 'true' && steps.build.outcome == 'success' }}
       uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
