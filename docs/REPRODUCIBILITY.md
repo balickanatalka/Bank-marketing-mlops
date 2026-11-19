@@ -101,7 +101,10 @@ przygotowanie cech, trening oraz ewaluację modeli na zbiorze validation.
 Nie wykonano bezpośredniego porównania z pełnym archiwum materiałów prowadzącego,
 które nie było dostępne. MLflow (zajęcia 5) i Microsoft RAG pozostają przyszłymi etapami.
 
-Środowisko referencyjne: Windows, Python 3.12.10, uv 0.13.4.
+Historyczne środowisko etapów 1–8: Windows, Python 3.12.10, uv 0.13.4.
+Od zajęć 9 przypięty runtime to Python 3.12.16 i uv 0.13.9 w CI/Dockerze.
+Aktualizacja naprawia zgłoszenia bezpieczeństwa bazy; historyczne raporty nie
+są przepisywane. Wyniki bieżącego etapu: [raport techniczny zajęć 9](../reports/lesson9_technical_public.pl.md).
 `.python-version` przypina interpreter, `uv.lock` wersje zależności, a manifest
 danych sumę SHA-256 źródłowego CSV. Polecenia z katalogu głównego repozytorium:
 

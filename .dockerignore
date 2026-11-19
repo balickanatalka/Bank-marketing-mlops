@@ -1,0 +1,18 @@
+# Allowlist: never send local models, data, notebooks, Git or secrets to Docker.
+**
+!Dockerfile
+!.dockerignore
+!pyproject.toml
+!uv.lock
+!.python-version
+!src/
+!src/**
+src/**/__pycache__/
+src/**/*.pyc
+!configs/
+!configs/serving-logging.json
+!docs/
+!docs/api/
+!docs/api/openapi-v1.json
+!docs/THIRD_PARTY_NOTICES.md
+!DATA_LICENSE.md

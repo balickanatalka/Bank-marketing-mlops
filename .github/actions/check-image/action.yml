@@ -1,0 +1,104 @@
+name: Check local image candidate
+description: Build, verify and test a candidate; optionally run strict security scans; never publish
+inputs:
+  artifact-name:
+    description: Unique name for reports only
+    required: true
+  scan-security:
+    description: Run Syft and blocking Trivy in addition to functional image checks
+    default: 'true'
+outputs:
+  digest:
+    description: Digest of this built and checked candidate
+    value: ${{ steps.build.outputs.digest }}
+runs:
+  using: composite
+  steps:
+    - name: Validate report path and scan mode
+      id: configure
+      shell: bash
+      env:
+        EVIDENCE_NAME: ${{ inputs.artifact-name }}
+        SCAN_SECURITY: ${{ inputs.scan-security }}
+      run: |
+        [[ "$EVIDENCE_NAME" =~ ^[a-z][a-z0-9-]*$ ]]
+        [[ "$SCAN_SECURITY" == true || "$SCAN_SECURITY" == false ]]
+        mkdir -p "artifacts/ci/$EVIDENCE_NAME"
+        echo "BANK_CI_EVIDENCE_DIR=artifacts/ci/$EVIDENCE_NAME" >> "$GITHUB_ENV"
+    - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+      with:
+        python-version-file: .python-version
+    - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+      with:
+        version: '0.13.9'
+        enable-cache: true
+    - uses: docker/setup-docker-action@3f1ab1ab0e29231562e4db4ca600c1a49653bac6 # v5.7.0
+      with:
+        daemon-config: '{"features":{"containerd-snapshotter":true}}'
+    - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+    - name: Build without publishing
+      id: build
+      uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+      with:
+        context: .
+        load: true
+        push: false
+        sbom: true
+        provenance: mode=min
+        tags: bank-marketing-api:ci
+        cache-from: type=gha,scope=bank-marketing-api
+        cache-to: type=gha,mode=max,scope=bank-marketing-api
+    - name: Verify image bytes and attestation subjects
+      shell: bash
+      env:
+        EXPECTED_IMAGE_DIGEST: ${{ steps.build.outputs.digest }}
+      run: |
+        uv sync --locked
+        docker image save bank-marketing-api:ci --output "$BANK_CI_EVIDENCE_DIR/image.oci.tar"
+        uv run --locked python -m scripts.verify_image_evidence --archive "$BANK_CI_EVIDENCE_DIR/image.oci.tar" --digest "$EXPECTED_IMAGE_DIGEST" > "$BANK_CI_EVIDENCE_DIR/image-attestations.json"
+    - name: Real HTTP with a verified synthetic model and without a model
+      shell: bash
+      env:
+        BANK_MARKETING_TEST_IMAGE: bank-marketing-api:ci
+      run: uv run --locked pytest tests/test_serving.py -q -k container_http --basetemp "$BANK_CI_EVIDENCE_DIR/tests" --junitxml "$BANK_CI_EVIDENCE_DIR/container-tests.xml"
+    - name: Generate independent candidate SBOM
+      if: ${{ always() && inputs.scan-security == 'true' && steps.build.outcome == 'success' }}
+      uses: anchore/sbom-action@66cbf4bc1f1c0d2edc94016e65bc221b6bb0ad6c # v0.24.3
+      with:
+        image: bank-marketing-api:ci
+        syft-version: v1.57.2
+        format: cyclonedx-json
+        output-file: artifacts/ci/${{ inputs.artifact-name }}/sbom.cdx.json
+        upload-artifact: false
+        upload-release-assets: false
+    - name: Blocking image vulnerability scan
+      if: ${{ always() && inputs.scan-security == 'true' && steps.build.outcome == 'success' }}
+      uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+      with:
+        version: v0.76.2
+        image-ref: bank-marketing-api:ci
+        format: json
+        output: artifacts/ci/${{ inputs.artifact-name }}/trivy.json
+        severity: HIGH,CRITICAL
+        exit-code: '1'
+        ignore-unfixed: false
+        scanners: vuln
+    - name: Record candidate identity even after scan failure
+      if: ${{ always() && steps.build.outcome == 'success' }}
+      shell: bash
+      env:
+        EXPECTED_IMAGE_DIGEST: ${{ steps.build.outputs.digest }}
+      run: |
+        docker image inspect bank-marketing-api:ci --format '{{json .}}' > "$BANK_CI_EVIDENCE_DIR/image.json"
+        printf '%s\n' "$EXPECTED_IMAGE_DIGEST" > "$BANK_CI_EVIDENCE_DIR/image-digest.txt"
+        printf '%s\n' "$GITHUB_SHA" > "$BANK_CI_EVIDENCE_DIR/git-sha.txt"
+    - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+      if: ${{ always() && steps.configure.outcome == 'success' }}
+      with:
+        name: ${{ inputs.artifact-name }}
+        path: |
+          artifacts/ci/${{ inputs.artifact-name }}/*.json
+          artifacts/ci/${{ inputs.artifact-name }}/*.xml
+          artifacts/ci/${{ inputs.artifact-name }}/*.txt
+        retention-days: 14
+        if-no-files-found: error

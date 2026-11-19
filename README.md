@@ -15,13 +15,14 @@ Nie jest przeznaczony do podejmowania rzeczywistych decyzji finansowych.
 |---|---|
 | Python, uv, plik blokady zależności i konfiguracja YAML | Dalsza automatyzacja jakości i utrzymania |
 | Automatyczne pobieranie UCI, manifest i pełny kontrakt danych | Weryfikacja operacyjna w kolejnych etapach |
-| Walidacja danych i podział chronologiczny | Docker oraz CI/CD z kontrolami jakości i bezpieczeństwa |
+| Walidacja danych i podział chronologiczny | Zielony zdalny CI i zatwierdzona publikacja obrazu |
 | Notebook EDA, DummyClassifier i LogisticRegression | Staging, shadow deployment i rollback |
 | Wspólny preprocessing, trening i ewaluacja przez CLI | Monitoring, dryf, SLI/SLO i kontrolowany retraining |
 | Testy pytest, Ruff i lokalne hooki pre-commit | Microsoft RAG z ewaluacją, cytowaniami i tracingiem |
 | Pipeline DVC: download, validate, prepare, train, evaluate; cache i parametry | Feature store tylko przy uzasadnionej potrzebie |
 | MLflow lokalnie: SQLite, 6 eksperymentów, parametry, metryki i artefakty | Dalsze etapy udostępniania modeli |
 | FastAPI: kontrakt v1, model z registry, health/ready, testy i lokalne demo HTTP | Produkcyjne zatwierdzenie modelu i usługi |
+| Docker, workflow CI, SBOM, skany i przenośna paczka modelu | Usunięcie otwartych zgłoszeń bezpieczeństwa; GHCR po zielonych bramkach |
 
 Microsoft RAG będzie rozszerzeniem korzystającym z dokumentacji i raportów MLOps.
 Nie zastępuje klasycznego modelu ani wymagań związanych z jego cyklem życia.
@@ -207,7 +208,8 @@ osób. Nie przeprowadzono jeszcze pełnej analizy podgrup ani oceny bezstronnoś
 
 Wymagane są Git, [uv](https://docs.astral.sh/uv/getting-started/installation/)
 oraz dostęp do internetu do instalacji zależności i pierwszego pobrania danych.
-Projekt przypina Python **3.12.10**; uv może pobrać brakujący interpreter.
+Projekt przypina Python **3.12.16**; uv może pobrać brakujący interpreter.
+W bieżącym etapie używaj uv **0.13.9**, tak jak w CI i Dockerfile.
 Bieżący eksperyment nie wymaga GPU, konta Azure ani płatnej infrastruktury.
 Zapotrzebowanie na zasoby nie zostało zmierzone na innych komputerach.
 
@@ -371,8 +373,10 @@ Własny kod projektu nie jest udostępniony na licencji open source. Dane UCI i 
 
 ## Zakres bieżącego etapu
 
-Projekt realizowany indywidualnie, docelowo na ocenę **5,0**. Po zajęciach 7
-nie są jeszcze wykonane elementy usług, CI, wdrożenia, monitoringu i CT.
+Projekt realizowany indywidualnie, docelowo na ocenę **5,0**. Po zajęciach 9
+API i lokalny kontener działają, a workflow CI jest przygotowany. Bramki skanów
+wykrywają otwarte podatności i blokują publikację. Zdalne CI, wdrożenie,
+monitoring i CT nie mają jeszcze kompletu dowodów.
 [Raport zajęć 7](reports/lesson7_registry.pl.md) opisuje publiczny zakres i dowody.
 Odtworzenie korzysta wyłącznie z plików repozytorium oraz publicznego źródła danych;
 nie wymaga lokalnej dokumentacji organizacyjnej.
@@ -395,3 +399,21 @@ z poprzedniego komputera. Instrukcja startu i wyboru wersji:
 Kontrakt i JSON: [API v1](docs/API_CONTRACT.md).
 Notebook: [04_model_serving.ipynb](notebooks/04_model_serving.ipynb).
 Wyniki i ograniczenia: [raport zajęć 8](reports/lesson8_serving.pl.md).
+
+## Zajęcia 9 — kontener i CI
+
+Środowisko bieżącego etapu: Python **3.12.16**, uv **0.13.9**, zależności z `uv.lock`.
+Instrukcje budowania, eksportu modelu, Compose, skanów i publikacji:
+[CI i łańcuch dostaw](docs/CI_SUPPLY_CHAIN.pl.md).
+Aktualny stan wymagań i ograniczenia:
+[raport techniczny zajęć 9](reports/lesson9_technical_public.pl.md).
+Nie uznajemy lokalnego builda za dowód udanego GitHub Actions.
+
+Opis bramek, odtwarzania środowiska i ograniczeń bezpieczeństwa:
+[dokumentacja techniczna CI](docs/CI_SUPPLY_CHAIN.pl.md).
+
+Lokalnie wdrożono wariant 1: osobne joby funkcjonalne i audyty bezpieczeństwa,
+z zachowaniem ścisłej blokady publikacji. Czerwony security nie blokuje już
+testowania kandydata, ale blokuje publikację i pełny sukces workflow.
+Aktualna allowlista znajduje się w publicznym raporcie technicznym powyżej.
+GitHub Actions nie został jeszcze uruchomiony dla tych lokalnych zmian.

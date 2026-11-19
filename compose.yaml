@@ -1,0 +1,22 @@
+services:
+  api:
+    image: bank-marketing-api:dev
+    build: .
+    ports:
+      - "127.0.0.1:8000:8000"
+    environment:
+      BANK_MARKETING_SERVING_BUNDLE: /model
+      BANK_MARKETING_SERVING_RECEIPT_SHA256: ${BANK_MARKETING_SERVING_RECEIPT_SHA256:?Set the exported receipt hash}
+    volumes:
+      - type: bind
+        source: ${BANK_MARKETING_BUNDLE_DIR:?Set the exported bundle directory}
+        target: /model
+        read_only: true
+        bind:
+          create_host_path: false
+    read_only: true
+    tmpfs:
+      - /tmp:size=128m,mode=1777
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    init: true

@@ -3,6 +3,7 @@
 import copy
 import json
 import logging
+import os
 import shutil
 
 import mlflow.sklearn
@@ -16,6 +17,7 @@ from src import experiments, registry, serving
 from src.config import ROOT, load_config
 from src.pipeline import write_json
 from src.serving import ServingSettings, create_app
+from src.serving_bundle import export_bundle
 from src.serving_contract import API_TO_MODEL, PredictResponse, example_request
 
 
@@ -297,3 +299,80 @@ def test_openapi_snapshot_and_response_contract():
         broken = {k: v for k, v in response.items() if k != required}
         with pytest.raises(ValidationError):
             PredictResponse.model_validate(broken)
+
+
+def test_portable_bundle_parity_and_no_registry_dependency(service, tmp_path):
+    settings, store = service
+    before = fingerprint(store.directory)
+    destination = tmp_path / "bundle"
+    digest = export_bundle(settings.evidence, "1", destination)
+    assert fingerprint(store.directory) == before
+    with TestClient(create_app(settings)) as client:
+        expected = client.post("/v1/predict", json=example_request()).json()
+    # Move the package to simulate a different machine or container mount.
+    moved = tmp_path / "elsewhere"
+    destination.rename(moved)
+    with TestClient(create_app(ServingSettings(bundle=moved, receipt_sha256=digest))) as client:
+        assert client.get("/health/ready").status_code == 200
+        response = client.post("/v1/predict", json=example_request())
+        assert response.status_code == 200
+        assert response.json()["predictions"] == expected["predictions"]
+        assert response.json()["model_version"] == "1"
+
+
+@pytest.mark.parametrize("damage", ["anchor", "receipt", "model", "ml_bom", "selector"])
+def test_portable_bundle_fails_closed(service, tmp_path, damage, monkeypatch):
+    settings, _ = service
+    destination = tmp_path / "bundle"
+    digest = export_bundle(settings.evidence, "1", destination)
+    if damage == "anchor":
+        digest = "0" * 64
+    elif damage == "receipt":
+        (destination / "receipt.json").write_text("{}", encoding="utf-8")
+    elif damage == "model":
+        model = next(destination.rglob("*.skops"))
+        model.write_bytes(b"corrupted")
+    elif damage == "ml_bom":
+        (destination / "ml-bom.json").write_text("{}", encoding="utf-8")
+    else:
+        settings = ServingSettings(
+            evidence=settings.evidence, bundle=destination, receipt_sha256=digest
+        )
+    if damage != "selector":
+        settings = ServingSettings(bundle=destination, receipt_sha256=digest)
+
+    # Verification must reject corrupt inputs before the deserializer runs.
+    def forbidden(*args, **kwargs):
+        pytest.fail("Unverified model reached deserialization")
+
+    monkeypatch.setattr(mlflow.sklearn, "load_model", forbidden)
+    with TestClient(create_app(settings)) as client:
+        assert client.get("/health/live").status_code == 200
+        assert client.get("/health/ready").status_code == 503
+        assert client.post("/v1/predict", json=example_request()).status_code == 503
+
+
+def test_bundle_environment_requires_exclusive_source(monkeypatch, tmp_path):
+    for name in tuple(os.environ):
+        if name.startswith("BANK_MARKETING_SERVING_"):
+            monkeypatch.delenv(name)
+    monkeypatch.setenv("BANK_MARKETING_SERVING_BUNDLE", str(tmp_path))
+    monkeypatch.setenv("BANK_MARKETING_SERVING_RECEIPT_SHA256", "a" * 64)
+    assert ServingSettings.from_environment().bundle == tmp_path
+    monkeypatch.setenv("BANK_MARKETING_SERVING_EVIDENCE", "evidence.json")
+    with pytest.raises(ValueError, match="Choose"):
+        ServingSettings.from_environment()
+
+
+@pytest.mark.skipif(
+    not os.environ.get("BANK_MARKETING_TEST_IMAGE"), reason="Explicit Docker image required"
+)
+def test_container_http(service, tmp_path):
+    from scripts.container_smoke import check_image
+
+    settings, _ = service
+    destination = tmp_path / "bundle"
+    digest = export_bundle(settings.evidence, "1", destination)
+    image = os.environ["BANK_MARKETING_TEST_IMAGE"]
+    assert check_image(image)["status"] == "PASS"
+    assert check_image(image, destination, digest)["status"] == "PASS"

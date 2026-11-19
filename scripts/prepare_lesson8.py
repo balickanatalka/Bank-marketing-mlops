@@ -16,8 +16,10 @@ from src.experiments import sha256
 OVERLAY = (
     "pyproject.toml",
     "uv.lock",
+    ".python-version",
     ".gitignore",
     "src/serving.py",
+    "src/serving_bundle.py",
     "src/serving_contract.py",
     "scripts/demo_lesson8.py",
     "scripts/prepare_lesson8.py",

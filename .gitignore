@@ -67,6 +67,13 @@ private_notes/
 docs/PROJECT_PLAN.md
 docs/AI_USAGE.pl.md
 docs/MOODLE_COMPLIANCE.pl.md
+/docs/ASSESSMENT_EVIDENCE.pl.md
+
+# Historical local lesson 9 reports; public summary has a separate filename.
+/reports/lesson9_local_review.pl.md
+/reports/lesson9_resume_20261119.pl.md
+/reports/lesson9_minimization_20261119.pl.md
+/reports/lesson9_variant1_20261119.pl.md
 
 # Local MLflow metadata and SQLite sidecars
 .mlflow/

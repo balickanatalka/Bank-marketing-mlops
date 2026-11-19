@@ -1,0 +1,199 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: Publish only after all functional and security gates pass
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  MLFLOW_ENABLE_TELEMETRY: 'false'
+  MLFLOW_DISABLE_AGENT_HINT: '1'
+  OMP_NUM_THREADS: '1'
+  OPENBLAS_NUM_THREADS: '1'
+  UV_PYTHON_DOWNLOADS: never
+
+jobs:
+  functional_checks:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version-file: .python-version
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        with:
+          version: '0.13.9'
+          enable-cache: true
+      - run: uv sync --locked
+      - run: uv run --locked python -m scripts.verify_ci_policy
+      - run: uv run --locked ruff check .
+      - run: uv run --locked ruff format --check .
+      - name: Unit, data, registry, API v1 and property tests
+        run: uv run --locked pytest -q --junitxml=artifacts/ci/tests.xml
+      - name: Short synthetic validation and training
+        run: uv run --locked python -m scripts.ci_smoke --output artifacts/ci/smoke
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: functional-checks
+          path: |
+            artifacts/ci/tests.xml
+            artifacts/ci/smoke/*.json
+          retention-days: 14
+          if-no-files-found: error
+
+  functional_image:
+    needs: [functional_checks]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/check-image
+        with:
+          artifact-name: functional-image
+          scan-security: 'false'
+
+  security_dev:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version-file: .python-version
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        with:
+          version: '0.13.9'
+          enable-cache: true
+      - run: mkdir -p artifacts/ci/security-dev
+      - name: Export complete developer and test profile
+        run: uv export --locked --all-groups --no-hashes --no-emit-project --output-file artifacts/ci/security-dev/requirements.txt
+      - name: Blocking complete dependency audit
+        run: uvx --from pip-audit==2.10.1 pip-audit --strict --disable-pip --no-deps -r artifacts/ci/security-dev/requirements.txt --format json --output artifacts/ci/security-dev/pip-audit.json
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: security-dev
+          path: artifacts/ci/security-dev/
+          retention-days: 14
+          if-no-files-found: error
+
+  security_runtime:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version-file: .python-version
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        with:
+          version: '0.13.9'
+          enable-cache: true
+      - run: mkdir -p artifacts/ci/security-runtime
+      - name: Export Linux runtime profile from the same lock
+        run: uv export --locked --no-dev --no-hashes --no-emit-project --output-file artifacts/ci/security-runtime/requirements.txt
+      - name: Blocking runtime dependency audit
+        run: uvx --from pip-audit==2.10.1 pip-audit --strict --disable-pip --no-deps -r artifacts/ci/security-runtime/requirements.txt --format json --output artifacts/ci/security-runtime/pip-audit.json
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: security-runtime
+          path: artifacts/ci/security-runtime/
+          retention-days: 14
+          if-no-files-found: error
+
+  security_history:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Scan complete reachable history with redacted findings
+        run: |
+          mkdir -p artifacts/ci/security-history
+          docker run --rm -v "$PWD:/repo:ro" -v "$PWD/artifacts/ci/security-history:/report" zricethezav/gitleaks:v8.30.1@sha256:c00b6bd0aeb3071cbcb79009cb16a60dd9e0a7c60e2be9ab65d25e6bc8abbb7f git /repo --log-opts=--all --redact=100 --report-format json --report-path /report/gitleaks.json
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: security-history
+          path: artifacts/ci/security-history/gitleaks.json
+          retention-days: 14
+          if-no-files-found: error
+
+  security_image:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/check-image
+        with:
+          artifact-name: security-image
+          scan-security: 'true'
+
+  publish:
+    needs: [functional_checks, functional_image, security_dev, security_runtime, security_history, security_image]
+    if: >-
+      ${{ github.event_name == 'workflow_dispatch' && inputs.publish && github.ref == 'refs/heads/main' && needs.functional_checks.result == 'success' && needs.functional_image.result == 'success' && needs.security_dev.result == 'success' && needs.security_runtime.result == 'success' && needs.security_history.result == 'success' && needs.security_image.result == 'success' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Revalidate the exact candidate before any registry credentials
+        id: candidate
+        uses: ./.github/actions/check-image
+        with:
+          artifact-name: publish-image
+          scan-security: 'true'
+      - name: GHCR reference
+        run: echo "IMAGE=ghcr.io/${GITHUB_REPOSITORY,,}" >> "$GITHUB_ENV"
+      - uses: docker/login-action@8aa5831fb8d48d8f76594c7ddde61ae58019f550 # v4.8.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Publish the verified candidate without rebuilding it
+        env:
+          EXPECTED_IMAGE_DIGEST: ${{ steps.candidate.outputs.digest }}
+        run: |
+          test "$(docker image inspect bank-marketing-api:ci --format '{{.Descriptor.digest}}')" = "$EXPECTED_IMAGE_DIGEST"
+          docker tag bank-marketing-api:ci "$IMAGE:$GITHUB_SHA"
+          docker push "$IMAGE:$GITHUB_SHA"
+          docker image inspect "$IMAGE:$GITHUB_SHA" --format '{{json .RepoDigests}}' > registry-digest.json
+          printf 'Commit: %s\nImage: %s:%s\n' "$GITHUB_SHA" "$IMAGE" "$GITHUB_SHA" >> "$GITHUB_STEP_SUMMARY"
+          cat registry-digest.json >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: registry-digest
+          path: registry-digest.json
+          if-no-files-found: error

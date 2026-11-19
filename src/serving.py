@@ -17,6 +17,7 @@ from fastapi.responses import JSONResponse
 from sklearn.pipeline import Pipeline
 
 from src.registry import LocalRegistry, input_schema, validate_input
+from src.serving_bundle import load_bundle
 from src.serving_contract import (
     API_TO_MODEL,
     ErrorResponse,
@@ -31,22 +32,27 @@ LOGGER = logging.getLogger("bank_marketing.serving")
 
 @dataclass(frozen=True)
 class ServingSettings:
-    """An explicit evidence file and exactly one version or challenger selector."""
+    """Use registry evidence plus selector, or a bundle plus external receipt hash."""
 
-    evidence: Path
+    evidence: Path | None = None
     version: str | None = None
     alias: str | None = None
+    bundle: Path | None = None
+    receipt_sha256: str | None = None
 
     @classmethod
     def from_environment(cls):
         """Read configuration at startup; a fresh clone has no default registry."""
         evidence = os.environ.get("BANK_MARKETING_SERVING_EVIDENCE")
-        if not evidence:
-            raise ValueError("Explicit serving evidence is required")
+        bundle = os.environ.get("BANK_MARKETING_SERVING_BUNDLE")
+        if bool(evidence) == bool(bundle):
+            raise ValueError("Choose explicit registry evidence or a portable bundle")
         return cls(
-            Path(evidence),
+            Path(evidence) if evidence else None,
             os.environ.get("BANK_MARKETING_SERVING_VERSION"),
             os.environ.get("BANK_MARKETING_SERVING_ALIAS"),
+            Path(bundle) if bundle else None,
+            os.environ.get("BANK_MARKETING_SERVING_RECEIPT_SHA256"),
         )
 
 
@@ -63,6 +69,15 @@ class LoadedModel:
 
 def load_model(settings: ServingSettings) -> LoadedModel:
     """Reuse lesson-7 integrity, lineage and quality gates without alias writes."""
+    if settings.bundle is not None:
+        if any(
+            value is not None for value in (settings.evidence, settings.version, settings.alias)
+        ):
+            raise ValueError("Bundle and registry selectors are mutually exclusive")
+        model, metadata, receipt = load_bundle(settings.bundle, settings.receipt_sha256)
+        return checked_model(model, metadata, receipt["model_name"], receipt["model_version"])
+    if settings.evidence is None or settings.receipt_sha256 is not None:
+        raise ValueError("Explicit registry evidence is required")
     if (settings.version is None) == (settings.alias is None):
         raise ValueError("Choose exactly one model selector")
     if settings.alias is not None and settings.alias != "challenger":
@@ -74,16 +89,19 @@ def load_model(settings: ServingSettings) -> LoadedModel:
     store = LocalRegistry.from_evidence(settings.evidence)
     version = settings.version or store.resolve(settings.alias)
     metadata = store.metadata(version)
+    store.check(version)
+    model = store.load(version)
+    return checked_model(model, metadata, store.name, version)
+
+
+def checked_model(model: Pipeline, metadata: dict, name: str, version: str) -> LoadedModel:
+    """Apply the same v1 feature and binary-output checks to either package source."""
     expected = input_schema(list(API_TO_MODEL.values()))
     if list(metadata["schema"].items()) != list(expected.items()):
         raise ValueError("Model does not implement the v1 feature contract")
-    store.check(version)
-    model = store.load(version)
     if not isinstance(model, Pipeline) or list(model.classes_) != [0, 1]:
         raise ValueError("A complete binary pipeline is required")
-    return LoadedModel(
-        model, store.name, version, metadata["parameters"]["decision_threshold"], expected
-    )
+    return LoadedModel(model, name, version, metadata["parameters"]["decision_threshold"], expected)
 
 
 def score(loaded: LoadedModel, request: PredictRequest) -> list[Prediction]:

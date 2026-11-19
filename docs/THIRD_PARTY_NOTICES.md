@@ -1,5 +1,13 @@
 # Komponenty zewnętrzne
 
+**Uzupełnienie zajęć 9 (2026-11-19):** bieżący runtime to Python 3.12.16 (PSF),
+uv 0.13.9 (MIT OR Apache-2.0), baza Debian trixie i Tornado 6.6.1 (Apache-2.0).
+Niżej pozostaje historyczna inwentaryzacja wcześniejszego etapu.
+Obraz zachowuje pliki licencji dołączone do zainstalowanych dystrybucji.
+Rzeczywisty inwentarz obrazu generuje Syft; SBOM nie zastępuje analizy obowiązków
+redystrybucji. Licencje narzędzi i granica publikacji:
+[CI_SUPPLY_CHAIN.pl.md](CI_SUPPLY_CHAIN.pl.md).
+
 Aktualizacja: 2026-10-27. Zakres: zajęcia 3, źródła projektu i zależności
 z `pyproject.toml` oraz `uv.lock`. Lock zawiera 153 zewnętrzne dystrybucje.
 Sprawdzono metadane 150 dystrybucji z lokalnego środowiska oraz teksty licencji
