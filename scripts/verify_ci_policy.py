@@ -85,6 +85,39 @@ def image_step(job: dict) -> dict:
     return steps[0]
 
 
+def validate_uci_gate(job: dict) -> None:
+    """Require fresh public data, the full test suite and non-skipped UCI evidence."""
+    require(
+        job.get("env", {}).get("BANK_MARKETING_QUALITY_CSV")
+        == "${{ github.workspace }}/artifacts/ci/uci/bank-additional-full.csv",
+        "Real UCI quality test must use the prepared CSV",
+    )
+    steps = job["steps"]
+    commands = [
+        "uv run --locked python -m scripts.ci_uci prepare --directory artifacts/ci/uci",
+        "uv run --locked pytest -q --junitxml=artifacts/ci/tests.xml",
+        "uv run --locked python -m scripts.ci_uci verify-tests "
+        "--junit artifacts/ci/tests.xml > artifacts/ci/uci/quality-gate.json",
+    ]
+    selected = []
+    for command in commands:
+        matches = [s for s in steps if normalize(s.get("run", "")) == command]
+        require(len(matches) == 1 and "if" not in matches[0], "Missing unconditional UCI gate")
+        selected.append(steps.index(matches[0]))
+    require(selected == sorted(selected), "UCI preparation/test/evidence order changed")
+    upload = next(s for s in steps if s.get("uses", "").startswith("actions/upload-artifact@"))
+    require(
+        upload["with"]["path"].splitlines()
+        == [
+            "artifacts/ci/tests.xml",
+            "artifacts/ci/smoke/*.json",
+            "artifacts/ci/uci/validation.json",
+            "artifacts/ci/uci/quality-gate.json",
+        ],
+        "Functional CI may upload reports only, never raw UCI data or models",
+    )
+
+
 def validate_policy(workflow: dict, action: dict) -> None:
     """Fail closed when the workflow weakens gates or exports an unapproved image.
 
@@ -123,6 +156,7 @@ def validate_policy(workflow: dict, action: dict) -> None:
         jobs["functional_image"]["needs"] == ["functional_checks"],
         "Functional image is coupled to security",
     )
+    validate_uci_gate(jobs["functional_checks"])
     for name, mode in [
         ("functional_image", "false"),
         ("security_image", "true"),

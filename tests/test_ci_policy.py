@@ -212,3 +212,44 @@ def test_sbom_must_use_verified_oci_bytes_and_block_on_bad_reports(mutation):
         syft["with"]["registry-username"] = "unexpected"
     with pytest.raises(ValueError):
         validate_policy(workflow, action)
+
+
+@pytest.mark.parametrize(
+    "mutation",
+    [
+        "csv",
+        "prepare",
+        "skip_prepare",
+        "evidence",
+        "skip_evidence",
+        "junit",
+        "filter",
+        "raw_upload",
+    ],
+)
+def test_real_uci_gate_cannot_be_omitted_or_leak_raw_data(mutation):
+    workflow, action = copy.deepcopy(documents())
+    job = workflow["jobs"]["functional_checks"]
+    steps = job["steps"]
+    prepare = next(s for s in steps if "ci_uci prepare" in s.get("run", ""))
+    evidence = next(s for s in steps if "ci_uci verify-tests" in s.get("run", ""))
+    if mutation == "csv":
+        job["env"]["BANK_MARKETING_QUALITY_CSV"] = "private/local.csv"
+    elif mutation == "prepare":
+        steps.remove(prepare)
+    elif mutation == "skip_prepare":
+        prepare["if"] = "false"
+    elif mutation == "evidence":
+        steps.remove(evidence)
+    elif mutation == "skip_evidence":
+        evidence["if"] = "false"
+    elif mutation == "junit":
+        evidence["run"] = evidence["run"].replace("tests.xml", "old.xml")
+    elif mutation == "filter":
+        test = next(s for s in steps if "pytest -q" in s.get("run", ""))
+        test["run"] += " -k not_uci"
+    elif mutation == "raw_upload":
+        upload = next(s for s in steps if s.get("uses", "").startswith("actions/upload-artifact@"))
+        upload["with"]["path"] += "\nartifacts/ci/uci/*.csv"
+    with pytest.raises(ValueError):
+        validate_policy(workflow, action)

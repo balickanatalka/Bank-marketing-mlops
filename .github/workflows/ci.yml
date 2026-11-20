@@ -28,6 +28,8 @@ jobs:
   functional_checks:
     runs-on: ubuntu-24.04
     timeout-minutes: 15
+    env:
+      BANK_MARKETING_QUALITY_CSV: ${{ github.workspace }}/artifacts/ci/uci/bank-additional-full.csv
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -43,8 +45,12 @@ jobs:
       - run: uv run --locked python -m scripts.verify_ci_policy
       - run: uv run --locked ruff check .
       - run: uv run --locked ruff format --check .
+      - name: Download and validate pinned public UCI data
+        run: uv run --locked python -m scripts.ci_uci prepare --directory artifacts/ci/uci
       - name: Unit, data, registry, API v1 and property tests
         run: uv run --locked pytest -q --junitxml=artifacts/ci/tests.xml
+      - name: Require executed real UCI quality gate
+        run: uv run --locked python -m scripts.ci_uci verify-tests --junit artifacts/ci/tests.xml > artifacts/ci/uci/quality-gate.json
       - name: Short synthetic validation and training
         run: uv run --locked python -m scripts.ci_smoke --output artifacts/ci/smoke
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
@@ -54,6 +60,8 @@ jobs:
           path: |
             artifacts/ci/tests.xml
             artifacts/ci/smoke/*.json
+            artifacts/ci/uci/validation.json
+            artifacts/ci/uci/quality-gate.json
           retention-days: 14
           if-no-files-found: error
 

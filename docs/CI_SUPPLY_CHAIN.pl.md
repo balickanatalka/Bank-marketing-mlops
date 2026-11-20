@@ -7,7 +7,7 @@ updated: 2026-11-19
 
 Workflow `.github/workflows/ci.yml` uruchamia się na push, pull request oraz ręcznie.
 `functional_checks` odtwarza środowisko z `uv.lock`, wykonuje Ruff, pytest,
-kontrakt v1, walidację syntetyki i krótki trening Dummy/LogisticRegression.
+kontrakt v1, walidację syntetyki, obowiązkową bramkę UCI i krótki trening Dummy/LogisticRegression.
 `functional_image` zależy wyłącznie od tych testów i buduje oraz sprawdza HTTP
 kandydata. Czerwony audyt developerski nie blokuje zbierania dowodów funkcjonalnych.
 
@@ -76,12 +76,24 @@ uv run --locked pytest tests/test_serving.py -q -k container_http
 Remove-Item Env:BANK_MARKETING_TEST_IMAGE
 ```
 
-Fixture CI jest generowany deterministycznie, walidowany tym samym kontraktem
+Syntetyczny fixture CI jest generowany deterministycznie, walidowany tym samym kontraktem
 21 kolumn i dzielony chronologicznie. Modele korzystają ze wspólnego preprocessingu.
 Metryki dotyczą wyłącznie syntetycznej kontroli działania kodu. Nie dowodzą jakości
 na UCI i nie zastępują bramki `tests/test_uci_quality.py`. Test UCI wymaga jawnego
-`BANK_MARKETING_QUALITY_CSV`; bez niego jest pomijany. Final test i replay nie są
-używane do treningu ani wyboru modelu.
+`BANK_MARKETING_QUALITY_CSV`; lokalnie bez niego jest pomijany. W functional_checks
+CI zmienna wskazuje świeżą kopię pobraną przez `scripts.ci_uci prepare` z oficjalnego
+UCI do artifacts/ci/uci/. Pobranie weryfikuje manifest SHA-256, rozmiar, wymiary
+i schemat przed testami. Po pytest `scripts.ci_uci verify-tests` wymaga dokładnie
+jednego zakończonego sukcesem testu jakości UCI w JUnit. Brak testu, SKIP,
+duplikat, failure lub error powoduje FAIL. Niedostępne lub błędne dane również
+powodują FAIL; nie ma fallbacku do lokalnego zbioru ani syntetyki.
+Do artefaktów trafiają tylko raporty JSON i JUnit, bez CSV, modeli i baz MLflow.
+Final test i replay nie są używane do treningu ani wyboru modelu.
+
+Zmiana bramki UCI jest przygotowana lokalnie. Jej potwierdzenie na GitHubie
+wymaga osobno zatwierdzonej publikacji i nowego przebiegu; wcześniejszy CI
+pomijał rzeczywistą bramkę UCI. Szczegóły i dowody lokalne:
+[raport obowiązkowej bramki UCI](../reports/lesson9_uci_ci_20261120.pl.md).
 
 # Model poza obrazem
 
